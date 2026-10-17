@@ -1,2 +1,2 @@
 # Quiz-Core
-A CLI application for quizing both for students and teachers
+A CLI quizing application for both students and teachers
