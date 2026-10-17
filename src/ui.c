@@ -1,0 +1,55 @@
+#include"../include/ui.h"
+
+void clear_terminal()
+{/*Clears the whole terminal window*/
+    printf("\033[H\033[2J\033[3J"); // esc seq.->what it does
+                                    //"\033[H"->Takes cursor to home postion(top left position of visible terminal window, not always the first line's first column)
+                                    //"\033[J"->Clears from cursor position to end
+                                    //"\033[2J"->Pushes text in current screen backwards(scroll-back history)
+                                    //"\033[3J"->Clears whole scroll-back history of running terminal tab
+}
+
+void clear_screen()
+{/*Effectively removes all text from the start of the program*/
+    printf("\033[H\033[J");
+    fflush(stdout); // Flushes the stdout buffer (used for safety)
+}
+
+void print_divider(char ch, int length)
+{
+    for (int i = 0; i < length; i++)
+    {
+        putchar(ch);
+    }
+    putchar('\n');
+}
+void print_ascii_art(char filename[20])
+{
+    FILE *fp = fopen(filename, "r");
+    char c = fgetc(fp);
+    while (c != '*') //'*' is used at the beginning of the comment and end of the ascii art
+    {
+        putchar(c);
+        c = fgetc(fp);
+    }
+}
+
+void print_banner()
+{
+    printf("\033[36m\033[1m");
+    print_divider('=', 70);
+    print_ascii_art("ascii-arts/ascii-art-quizcore.txt");
+    print_divider('=', 70);
+    printf("\033[33m"
+           "               Test Your Skills & Challenge Your Mind!        \n"
+           "\033[0m");
+    printf("\n");
+}
+
+void print_main_menu()
+{
+    printf("  1. Login as Student\n");
+    printf("  1. Login as Teacher\n");
+    printf("  1. Login as Admin\n");
+    printf("  4. Exit\n\n");
+}
