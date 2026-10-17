@@ -1,0 +1,4 @@
+#Ignores test files
+test*
+#Ignores pre-compiled binaries
+quiz-core
