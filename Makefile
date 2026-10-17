@@ -11,7 +11,7 @@ TARGET = quiz-core
 all: $(TARGET)
 
 $(TARGET): $(SOURCES) $(HEADERS)
-        $(CC) $(CFLAGS) $(CFLAGS) $(SOURCES) -o $@
+	$(CC) $(CFLAGS) $(CFLAGS) $(SOURCES) -o $@
 
 clean:
-        rm -f $(TARGET)
+	rm -f $(TARGET)
