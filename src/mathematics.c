@@ -1,3 +1,4 @@
+#include<stdio.h>
 #include"../include/mathematics.h"
 
 int gcd(int a, int b)
