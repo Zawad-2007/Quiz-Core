@@ -3,3 +3,7 @@ src/test*
 test*
 #Ignores pre-compiled binaries
 quiz-core
+#Ignores .dat .txt .bin files
+*.bin
+*.txt
+*.dat
