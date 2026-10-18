@@ -1,0 +1,1 @@
+void rm_newl(char *string, int lenght);
