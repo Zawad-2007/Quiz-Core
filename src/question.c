@@ -2,6 +2,10 @@
 #include"../include/question.h"
 #include "../include/affine_cipher.h"
 
+#define qgets(buf,fstream) fgets(buf, sizeof(buf), fstream)
+
+#pragma pack(1)
+
 void encrypt_mcq_question(char original_filepath[], char encrypted_filepath[])
 { /*Encrypts quetsion written in this format:
  Question
@@ -15,14 +19,13 @@ void encrypt_mcq_question(char original_filepath[], char encrypted_filepath[])
  encrypted questions are stored in "encrypted_filepath" in binary format
  */
     int ques_count=0;
-    fgets(original_filepath, 50, stdin);
     FILE *unencrypted_ques = fopen(original_filepath, "r");
     Question q[100];
 
     if (unencrypted_ques == NULL)
     {
         printf("\033[31mFILE error\033[0m\n");
-        return 1;
+        return ;
     }
     else
     {
@@ -78,7 +81,7 @@ void decrypt_mcq_question(char encrypted_filepath[], char decrypted_filepath[])
         decrypt_affine((unsigned char *)q[i].opt_c, 20, 5, 2);
         decrypt_affine((unsigned char *)q[i].opt_d, 20, 5, 2);
         decrypt_affine((unsigned char *)q[i].ans, 5, 5, 2);
-        fwrite(q + i, sizeof(Question), 1, decrypted_filepath);
+        fwrite(q + i, sizeof(Question), 1, decrypted_ques);
         i++;
     }
 }
