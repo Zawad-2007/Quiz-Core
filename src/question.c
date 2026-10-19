@@ -40,6 +40,12 @@ void encrypt_mcq_question(char original_filepath[], char encrypted_filepath[])
         ques_count = i;
     }
 
+    if(ques_count>=100)
+    {
+        printf("\033[31mQuestion limit crossed\nAborting encryption...\033[0m");
+        return;
+    }
+
     fclose(unencrypted_ques);
 
     FILE *encrypted_ques = fopen(encrypted_filepath, "wb");
