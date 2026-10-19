@@ -3,6 +3,8 @@
 
 #include<stdio.h>
 
+#define ERR_STR "\033[31mFILE error\n"
+
 void clear_terminal();
 
 void clear_screen();

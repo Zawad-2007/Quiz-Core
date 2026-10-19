@@ -11,8 +11,8 @@ typedef struct
     char ans[5];
 } Question;
 
-void encrypt_question(char original_filepath[], char encrypted_filepath[]);
+void encrypt_mcq_question(char original_filepath[], char encrypted_filepath[]);
 
-void decrypt_question(char original_filepath[], char decrypted_filepath[]);
+void decrypt_mcq_question(char encrypted_filepath[], char decrypted_filepath[]);
 
 #endif
