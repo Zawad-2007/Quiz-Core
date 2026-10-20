@@ -1,5 +1,5 @@
-#ifndef QUESTION_H
-#define QUESTION_H
+#ifndef MCQ_H
+#define MCQ_H
 
 #define QUES_SIZE 256
 #define OPT_SIZE 64
