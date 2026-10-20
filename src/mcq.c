@@ -44,7 +44,7 @@ int encrypt_mcq_question(char original_filepath[], char encrypted_filepath[])
 
     if(ques_count>=100)
     {
-        printf("\033[31mQuestion limit crossed\nAborting encryption...\033[0m");
+        printf("\033[31mMaximum Question limit(100) crossed\nAborting encryption...\033[0m");
         return -1;
     }
 
