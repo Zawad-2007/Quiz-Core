@@ -6,7 +6,7 @@
 
 typedef struct
 {
-    char name[64];
+    char name[32];
     char roll[16];
     char subject[32];
     int total_marks;
@@ -16,5 +16,7 @@ typedef struct
 } QuizResult;
 
 void rm_newl(char *string, int lenght);
+
+void store_progress_in_file(QuizResult *progress);
 
 #endif
