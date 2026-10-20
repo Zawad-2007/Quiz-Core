@@ -17,6 +17,6 @@ typedef struct
 
 int encrypt_mcq_question(char original_filepath[], char encrypted_filepath[]);
 
-void decryptAndload_mcq_question(char encrypted_filepath[], char decrypted_filepath[], Question *q);
+void decryptAndload_mcq_question(char encrypted_filepath[], Question *q);
 
 #endif

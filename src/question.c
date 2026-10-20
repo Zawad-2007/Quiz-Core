@@ -65,11 +65,9 @@ int encrypt_mcq_question(char original_filepath[], char encrypted_filepath[])
     fclose(encrypted_ques);
     return ques_count;
 }
-void decryptAndload_mcq_question(char encrypted_filepath[], char decrypted_filepath[], Question *q)
-{
+void decryptAndload_mcq_question(char encrypted_filepath[], Question *q)
+{/**/
     FILE *encrypted_ques = fopen(encrypted_filepath, "rb");
-    FILE *decrypted_ques = fopen(decrypted_filepath, "wb");
-
 
     int i = 0;
     while (fread(q + i,sizeof(Question),1,encrypted_ques)!=0)
@@ -80,9 +78,7 @@ void decryptAndload_mcq_question(char encrypted_filepath[], char decrypted_filep
         decrypt_affine((unsigned char *)q[i].opt_c, OPT_SIZE, 5, 2);
         decrypt_affine((unsigned char *)q[i].opt_d, OPT_SIZE, 5, 2);
         decrypt_affine((unsigned char *)q[i].ans, ANS_SIZE, 5, 2);
-        fwrite(q + i, sizeof(Question), 1, decrypted_ques);
         i++;
     }
     fclose(encrypted_ques);
-    fclose(decrypted_ques);
 }
