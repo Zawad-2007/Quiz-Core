@@ -10,7 +10,8 @@ typedef struct
     char roll[16];
     char subject[32];
     int total_marks;
-    int acquired_marks;
+    int correct_ans;
+    int wrong_ans;
     float accuracy;
 } QuizResult;
 
