@@ -41,7 +41,7 @@ void print_banner()
     print_ascii_art("ascii-arts/ascii-art-quizcore.txt");
     print_divider('=', 70);
     printf("\033[33m"
-           "               Test Your Skills & Challenge Your Mind!        \n"
+           "       A CLI quizing application for both students and teachers\n"
            "\033[0m");
     printf("\n");
 }

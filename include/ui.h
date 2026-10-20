@@ -15,4 +15,6 @@ void print_ascii_art(char filename[20]);
 
 void print_banner();
 
+void print_main_menu();
+
 #endif
