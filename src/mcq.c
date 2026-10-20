@@ -18,7 +18,7 @@ int encrypt_mcq_question(char original_filepath[], char encrypted_filepath[])
  encrypted questions are stored in "encrypted_filepath" in binary format
  */
     int ques_count=0;
-    FILE *unencrypted_ques = fopen(original_filepath, "r");
+    FILE *unencrypted_ques = fopen(original_filepath, "rb");
     Question q[100];
 
     if (unencrypted_ques == NULL)
