@@ -65,7 +65,7 @@ int encrypt_mcq_question(char original_filepath[], char encrypted_filepath[])
     fclose(encrypted_ques);
     return ques_count;
 }
-void decrypt_mcq_question(char encrypted_filepath[], char decrypted_filepath[], Question *q)
+void decryptAndload_mcq_question(char encrypted_filepath[], char decrypted_filepath[], Question *q)
 {
     FILE *encrypted_ques = fopen(encrypted_filepath, "rb");
     FILE *decrypted_ques = fopen(decrypted_filepath, "wb");
