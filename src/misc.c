@@ -39,7 +39,7 @@ void store_progress_in_file(QuizResult *progress)
         return;
     }
 
-    fprintf(progress_file, "%-32s%-16s%-32s%-8d%-8d%-8d%-12.2f%%\n",
+    fprintf(progress_file, "%-32s%-16s%-32s%-8d%-8d%-8d%.2f%%\n",
             progress->name,
             progress->roll,
             progress->subject,
