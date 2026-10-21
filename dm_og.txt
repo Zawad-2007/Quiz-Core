@@ -1,0 +1,60 @@
+What is the negation of the statement “All integers are even”?
+A) All integers are odd.
+B) No integers are even.
+C) There exists an integer that is not even.
+D) There exists an integer that is even.
+C
+What is the cardinality of the set {a, b, c}?
+A) 2
+B) 3
+C) 4
+D) 0
+B
+Which connective represents “p and q”?
+A) Disjunction
+B) Implication
+C) Negation
+D) Conjunction
+D
+What is the truth value of p OR NOT p?
+A) Always true
+B) Always false
+C) True only when p is false
+D) True only when p is true
+A
+How many subsets does a set with 4 elements have?
+A) 8
+B) 12
+C) 16
+D) 24
+C
+In a simple graph, what is the maximum number of edges between 5 vertices?
+A) 5
+B) 10
+C) 15
+D) 20
+B
+What is the next term in the arithmetic sequence 3, 7, 11, 15, ...?
+A) 17
+B) 18
+C) 19
+D) 20
+C
+Which relation on a set is both reflexive, symmetric, and transitive?
+A) Equivalence relation
+B) Partial order
+C) Function
+D) Asymmetric relation
+A
+How many ways can 3 distinct books be arranged in a row?
+A) 3
+B) 6
+C) 9
+D) 12
+B
+What is the contrapositive of “If p, then q”?
+A) If q, then p.
+B) If not p, then not q.
+C) If not q, then not p.
+D) If p, then not q.
+C

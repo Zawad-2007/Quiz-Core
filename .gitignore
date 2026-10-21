@@ -5,5 +5,5 @@ test*
 quiz-core
 #Ignores .dat .txt .bin files
 *.bin
-*.txt
-*.dat
+#*.txt
+#*.dat
