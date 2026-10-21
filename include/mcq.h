@@ -1,6 +1,8 @@
 #ifndef MCQ_H
 #define MCQ_H
 
+#include "misc.h"
+
 #define QUES_SIZE 256
 #define OPT_SIZE 64
 #define ANS_SIZE 8
@@ -17,6 +19,10 @@ typedef struct
 
 int encrypt_mcq_question(char original_filepath[], char encrypted_filepath[]);
 
-void decryptAndload_mcq_question(char encrypted_filepath[], Question *q);
+int decryptAndload_mcq_question(char encrypted_filepath[], Question *q);
+
+void start_mcq_quiz(QuizResult *qr_ptr);
+
+void run_mcq_quiz(Question *decrypted_q_ptr, QuizResult *qr_ptr, int ques_count);
 
 #endif
