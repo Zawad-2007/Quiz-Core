@@ -14,7 +14,7 @@
 
 3. Questions will be loaded and you have to type the correct option(A/B/C/D).
 
-4. Result will be shown after the quiz finishes and will be stored in status.txt.
+4. Result will be shown after the quiz finishes and will be encrypted and stored in progress.dat.
 
 **How to create Question text files**
 
