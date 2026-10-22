@@ -1,9 +1,6 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<string.h>
+
 #include"../include/mcq.h"
-#include "../include/misc.h"
-#include "../include/affine_cipher.h"
+
 
 #define qgets(buf,fstream) fgets(buf, sizeof(buf), fstream)
 

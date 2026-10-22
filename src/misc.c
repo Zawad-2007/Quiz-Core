@@ -1,6 +1,5 @@
 #include "../include/misc.h"
-#include<string.h>
-#include "../include/affine_cipher.h"
+
 
 void rm_newl(char *string, int lenght)
 {

@@ -1,6 +1,9 @@
 #ifndef MISC_H
 #define MISC_H
 
+#include <string.h>
+#include "affine_cipher.h"
+
 #include <stdio.h>
 #include <string.h>
 

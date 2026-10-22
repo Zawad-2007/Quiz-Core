@@ -1,7 +1,11 @@
 #ifndef MCQ_H
 #define MCQ_H
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "misc.h"
+#include "affine_cipher.h"
 
 #define QUES_SIZE 256
 #define OPT_SIZE 64
