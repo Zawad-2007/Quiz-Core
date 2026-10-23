@@ -49,4 +49,6 @@ void storeAndencrypt_progress_in_file(QuizResult *progress);
 
 void decryptAndload_progress_in_mem();
 
+void migrate_oldRecord_toNew();
+
 #endif
