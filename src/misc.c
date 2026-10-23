@@ -86,7 +86,7 @@ void decryptAndload_progress_in_mem()
 
     int r_count = 0;
     int i = 0;
-    while (fread(progress + i, sizeof(QuizResultStr), 1, encr_progress_file) != 0)
+    while (fread(progress , sizeof(QuizResultStr), 1, encr_progress_file) != 0)
     {
         decrypt_affine((unsigned char *)progress->name, 32, 5, 2);
         decrypt_affine((unsigned char *)progress->roll, 16, 5, 2);
@@ -127,7 +127,7 @@ void decryptAndload_progress_in_mem()
            progress->total_marks,
            progress->correct_ans,
            progress->wrong_ans,
-           progress->wrong_ans,
+           progress->ignored,
            progress->accuracy);
     if (r_count >= 256)
     { // resets the record in the end if the maximum limit crosses
