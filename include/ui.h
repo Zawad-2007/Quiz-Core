@@ -17,4 +17,8 @@ void print_banner();
 
 void print_main_menu();
 
+void print_student_menu();
+
+void print_teacher_menu();
+
 #endif

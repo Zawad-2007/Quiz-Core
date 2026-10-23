@@ -21,12 +21,12 @@ typedef struct
     char ans[8];
 } Question;
 
-int encrypt_mcq_question(char original_filepath[], char encrypted_filepath[]);
+int encrypt_mcq_question(char original_filepath[], char encrypted_filepath[], QuestionHeader q_head);
 
-int decryptAndload_mcq_question(char encrypted_filepath[], Question *q);
+int decryptAndload_mcq_question(char encrypted_filepath[], Question *q, QuestionHeader *q_head_ptr);
 
 void start_mcq_quiz(QuizResult *qr_ptr);
 
-void run_mcq_quiz(Question *decrypted_q_ptr, QuizResult *qr_ptr, int ques_count);
+void run_mcq_quiz(Question *decrypted_q_ptr, QuizResult *qr_ptr, int ques_count, QuestionHeader *ques_head);
 
 #endif

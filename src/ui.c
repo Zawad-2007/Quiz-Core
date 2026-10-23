@@ -49,7 +49,22 @@ void print_banner()
 void print_main_menu()
 {
     printf("  1. Login as Student\n");
-    printf("  1. Login as Teacher\n");
-    printf("  1. Login as Admin\n");
+    printf("  2. Login as Teacher\n");
+    printf("  3. Login as Admin\n");
     printf("  4. Exit\n\n");
+}
+
+void print_student_menu()
+{
+    printf("1. Start a quiz\n");
+    printf("2. Watch progress\n");
+    printf("3. Exit to main menu\n");
+}
+
+void print_teacher_menu()
+{
+    printf("1. Encrypt a question\n");
+    printf("2. Watch progress of students\n");
+    printf("3. Decrypt progress file\n");
+    printf("4. Exit to main menu\n");
 }
