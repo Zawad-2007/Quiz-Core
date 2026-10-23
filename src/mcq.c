@@ -54,7 +54,7 @@ int encrypt_mcq_question(char original_filepath[], char encrypted_filepath[], Qu
     
     encrypt_affine((unsigned char *)q_head->quiz_code, 16, 5, 2);
     encrypt_affine((unsigned char *)q_head->seconds_per_ques, 4, 5, 2);
-    fwrite(&q_head, sizeof(QuestionHeader), 1, encrypted_ques);
+    fwrite(q_head, sizeof(QuestionHeader), 1, encrypted_ques);
 
     for (int i = 0; i < ques_count; i++)
     {
@@ -132,6 +132,7 @@ void run_mcq_quiz(Question *decrypted_q_ptr, QuizResult *qr_ptr, int ques_count,
     printf("Total questions : %d\n", ques_count);
     qr_ptr->total_marks = ques_count;
     qr_ptr->correct_ans = 0;
+    qr_ptr->wrong_ans = 0;
 
     for (int i = 0; i < ques_count; i++)
     {
@@ -139,7 +140,7 @@ void run_mcq_quiz(Question *decrypted_q_ptr, QuizResult *qr_ptr, int ques_count,
         printf("%s%s%s%s\n", decrypted_q_ptr[i].opt_a, decrypted_q_ptr[i].opt_b, decrypted_q_ptr[i].opt_c, decrypted_q_ptr[i].opt_d);
 
         char ans_by_stud[8];
-        printf("Ans (A/B/C/D) :");
+        printf("Ans (A/B/C/D) [Enter 0 to ignore] :");
 
         if (fgets(ans_by_stud, sizeof(ans_by_stud), stdin) == NULL)
         {
@@ -162,6 +163,11 @@ void run_mcq_quiz(Question *decrypted_q_ptr, QuizResult *qr_ptr, int ques_count,
             printf("Correct!\n");
             qr_ptr->correct_ans++;
         }
+        else if (ans_by_stud[0]=='0')
+        {
+            printf("Ignored\n");
+            qr_ptr->ignored++;
+        }
         else
         {
             printf("Incorrect answer!\n");
@@ -170,6 +176,6 @@ void run_mcq_quiz(Question *decrypted_q_ptr, QuizResult *qr_ptr, int ques_count,
         }
     }
 
-    qr_ptr->ignored = qr_ptr->total_marks - (qr_ptr->correct_ans + qr_ptr->wrong_ans);
+    qr_ptr->ignored += qr_ptr->total_marks - (qr_ptr->correct_ans + qr_ptr->wrong_ans + qr_ptr->ignored);  //Adds questions not answered because of time limit
     qr_ptr->accuracy = (qr_ptr->correct_ans * 100.00) / qr_ptr->total_marks;
 }
