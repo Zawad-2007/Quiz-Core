@@ -23,7 +23,7 @@ typedef struct
     char name[32];
     char roll[16];
     char subject[32];
-    char time[32];
+    char quiz_date[32];
     char total_marks[8];
     char correct_ans[8];
     char wrong_ans[8];
