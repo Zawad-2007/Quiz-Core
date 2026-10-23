@@ -10,7 +10,7 @@
 int main()
 {
     clear_screen();
-    // print_banner();
+    print_banner();
     print_main_menu();
 
     int main_menu_opt;
@@ -27,7 +27,7 @@ int main()
         QuizResult qr;
 
         clear_screen();
-        // print_banner();
+        print_banner();
         print_student_menu();
 
         handle_stud_menu(encr_ques_filepath, q, &qr);
@@ -56,8 +56,8 @@ int main()
 
         QuizResult qr;
         clear_screen();
-        // print_banner();
-        // Todo: Add QuestionHeader struct operations in encrypt_mcq_question() function
+        print_banner();
+        Todo: Add QuestionHeader struct operations in encrypt_mcq_question() function
         encrypt_mcq_question(og_ques_filepath, encr_ques_filepath, &ques_head);
         break;
     }
@@ -69,7 +69,7 @@ int main()
     case 4:
     {
         clear_screen();
-        // print_banner();
+        print_banner();
         printf("Thank you for trying quiz-core\n");
         return 0;
     }
