@@ -21,7 +21,7 @@ typedef struct
     char ans[8];
 } Question;
 
-int encrypt_mcq_question(char original_filepath[], char encrypted_filepath[], QuestionHeader q_head);
+int encrypt_mcq_question(char original_filepath[], char encrypted_filepath[], QuestionHeader *q_head);
 
 int decryptAndload_mcq_question(char encrypted_filepath[], Question *q, QuestionHeader *q_head_ptr);
 

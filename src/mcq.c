@@ -4,7 +4,7 @@
 
 #define qgets(buf,fstream) fgets(buf, sizeof(buf), fstream)
 
-int encrypt_mcq_question(char original_filepath[], char encrypted_filepath[], QuestionHeader q_head)
+int encrypt_mcq_question(char original_filepath[], char encrypted_filepath[], QuestionHeader *q_head)
 { /*Encrypts quetsion written in this format:
  Question
  opt_a
@@ -52,8 +52,8 @@ int encrypt_mcq_question(char original_filepath[], char encrypted_filepath[], Qu
     fclose(unencrypted_ques);
 
     
-    encrypt_affine((unsigned char *)q_head.quiz_code, 16, 5, 2);
-    encrypt_affine((unsigned char *)q_head.seconds_per_ques, 4, 5, 2);
+    encrypt_affine((unsigned char *)q_head->quiz_code, 16, 5, 2);
+    encrypt_affine((unsigned char *)q_head->seconds_per_ques, 4, 5, 2);
     fwrite(&q_head, sizeof(QuestionHeader), 1, encrypted_ques);
 
     for (int i = 0; i < ques_count; i++)
@@ -122,7 +122,10 @@ void run_mcq_quiz(Question *decrypted_q_ptr, QuizResult *qr_ptr, int ques_count,
 {
     strcpy(qr_ptr->quiz_code, ques_head->quiz_code);
 
-    time_t quiz_time = atoi(ques_head->seconds_per_ques)  * ques_count;
+    int sec_per_q;
+    sscanf(ques_head->seconds_per_ques, "%d", &sec_per_q);    // atoi only converts the first character to integer
+
+    time_t quiz_time = sec_per_q * ques_count; 
     time_t quiz_start_time = time(NULL);
     time_t cur_time;
 
