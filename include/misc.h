@@ -34,6 +34,13 @@ typedef struct
     char accuracy[8];
 } QuizResultStr;
 
+typedef struct
+{
+    char quiz_code[16];
+    float minu_marking_per_ques;
+    int seconds_per_ques;
+} QuestionHeader;
+
 void rm_newl(char *string, int lenght);
 
 void storeAndencrypt_progress_in_file(QuizResult *progress);
