@@ -5,6 +5,7 @@
 #include "affine_cipher.h"
 
 #include <stdio.h>
+#include<stdlib.h>
 #include <string.h>
 #include<time.h>
 
@@ -13,6 +14,7 @@ typedef struct
     char name[32];
     char roll[16];
     char subject[32];
+    char quiz_code[16];
     char quiz_date[32];
     int total_marks;
     int correct_ans;
@@ -26,6 +28,7 @@ typedef struct
     char name[32];
     char roll[16];
     char subject[32];
+    char quiz_code[16];
     char quiz_date[32];
     char total_marks[8];
     char correct_ans[8];
@@ -37,8 +40,7 @@ typedef struct
 typedef struct
 {
     char quiz_code[16];
-    float minu_marking_per_ques;
-    int seconds_per_ques;
+    char seconds_per_ques[4];
 } QuestionHeader;
 
 void rm_newl(char *string, int lenght);
