@@ -57,7 +57,6 @@ int main()
         QuizResult qr;
         clear_screen();
         print_banner();
-        Todo: Add QuestionHeader struct operations in encrypt_mcq_question() function
         encrypt_mcq_question(og_ques_filepath, encr_ques_filepath, &ques_head);
         break;
     }
