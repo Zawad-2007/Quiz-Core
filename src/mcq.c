@@ -101,12 +101,19 @@ void start_mcq_quiz(QuizResult *qr_ptr)
     printf("Subject of the exam : ");
     fgets(qr_ptr->subject, 32, stdin);
     rm_newl(qr_ptr->subject, 32);
+
+    time_t cur_time = time(NULL);
+    char *cur_time_str = ctime(&cur_time);
+    rm_newl(cur_time_str, 32);
+    strcpy(qr_ptr->quiz_date, cur_time_str);
 }
 
 void run_mcq_quiz(Question *decrypted_q_ptr, QuizResult *qr_ptr, int ques_count)
 {
     printf("Total questions : %d\n", ques_count);
     qr_ptr->total_marks = ques_count;
+
+    qr_ptr->correct_ans = 0;
 
     for (int i = 0; i < ques_count; i++)
     {
