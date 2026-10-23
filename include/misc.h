@@ -6,15 +6,18 @@
 
 #include <stdio.h>
 #include <string.h>
+#include<time.h>
 
 typedef struct
 {
     char name[32];
     char roll[16];
     char subject[32];
+    char quiz_date[32];
     int total_marks;
     int correct_ans;
     int wrong_ans;
+    int ignored;
     float accuracy;
 } QuizResult;
 
@@ -27,6 +30,7 @@ typedef struct
     char total_marks[8];
     char correct_ans[8];
     char wrong_ans[8];
+    char ignored[8];
     char accuracy[8];
 } QuizResultStr;
 

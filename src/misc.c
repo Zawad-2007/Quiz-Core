@@ -38,26 +38,31 @@ void storeAndencrypt_progress_in_file(QuizResult *progress)
     }
 
     QuizResultStr qr_str;
-    char t_marks[8], c_ans[8], w_ans[8], acc[8];
+    char t_marks[8], c_ans[8], w_ans[8], ignored[8], acc[8];
     snprintf(t_marks, 8, "%d", progress->total_marks);
     snprintf(c_ans, 8, "%d", progress->correct_ans);
     snprintf(w_ans, 8, "%d", progress->wrong_ans);
+    snprintf(ignored, 8, "%d", progress->ignored);
     snprintf(acc, 8, "%.2f", progress->accuracy);
 
     strcpy(qr_str.name, progress->name);
     strcpy(qr_str.roll, progress->roll);
     strcpy(qr_str.subject, progress->subject);
+    strcpy(qr_str.quiz_date, progress->quiz_date);
     strcpy(qr_str.total_marks, t_marks);
     strcpy(qr_str.correct_ans, c_ans);
     strcpy(qr_str.wrong_ans, w_ans);
+    strcpy(qr_str.ignored, ignored);
     strcpy(qr_str.accuracy, acc);
 
     encrypt_affine((unsigned char *)qr_str.name, 32, 5, 2);
     encrypt_affine((unsigned char *)qr_str.roll, 16, 5, 2);
     encrypt_affine((unsigned char *)qr_str.subject, 32, 5, 2);
+    encrypt_affine((unsigned char *)qr_str.quiz_date, 32, 5, 2);
     encrypt_affine((unsigned char *)qr_str.total_marks, 8, 5, 2);
     encrypt_affine((unsigned char *)qr_str.correct_ans, 8, 5, 2);
     encrypt_affine((unsigned char *)qr_str.wrong_ans, 8, 5, 2);
+    encrypt_affine((unsigned char *)qr_str.ignored, 8, 5, 2);
     encrypt_affine((unsigned char *)qr_str.accuracy, 8, 5, 2);
 
     fwrite(&qr_str, sizeof(QuizResultStr), 1, progress_file);
@@ -83,10 +88,12 @@ void decryptAndload_progress_in_mem()
         decrypt_affine((unsigned char *)progress[i].name, 32, 5, 2);
         decrypt_affine((unsigned char *)progress[i].roll, 16, 5, 2);
         decrypt_affine((unsigned char *)progress[i].subject, 32, 5, 2);
+        decrypt_affine((unsigned char *)progress[i].quiz_date, 32, 5, 2);
         decrypt_affine((unsigned char *)progress[i].total_marks, 8, 5, 2);
         decrypt_affine((unsigned char *)progress[i].correct_ans, 8, 5, 2);
         decrypt_affine((unsigned char *)progress[i].wrong_ans, 8, 5, 2);
-        decrypt_affine((unsigned char *)progress[i]. accuracy, 8, 5, 2);
+        decrypt_affine((unsigned char *)progress[i].ignored, 8, 5, 2);
+        decrypt_affine((unsigned char *)progress[i].accuracy, 8, 5, 2);
         i++;
     }
 
@@ -102,18 +109,20 @@ void decryptAndload_progress_in_mem()
         printf("\033[31mRecord limit maxed out\033[0m\n\033[32mThe progress record will be reset\033[0m\n");
     }
 
-        printf("%-32s%-16s%-32s%-8s%-8s%-8s%s%%\n", "Name", "Roll", "Subject", "Total", "Correct", "Wrong", "Accuracy");
-        printf("%-32s%-16s%-32s%-8s%-8s%-8s%s%%\n",
-               progress[r_count - 1].name,
-               progress[r_count - 1].roll,
-               progress[r_count - 1].subject,
-               progress[r_count - 1].total_marks,
-               progress[r_count - 1].correct_ans,
-               progress[r_count - 1].wrong_ans,
-               progress[r_count - 1].accuracy);
-        if (r_count >= 256)
-        {//resets the record in the end if the maximum limit crosses
-            FILE *reset_record = fopen("progress.dat", "wb");
-            fclose(reset_record);
-        }
+    printf("%-32s%-16s%-32s%-32s%-8s%-8s%-8s%-8s%s\n", "Name", "Roll", "Subject", "Quiz Date", "Total", "Correct", "Wrong", "Ignored", "Accuracy");
+    printf("%-32s%-16s%-32s%-32s%-8s%-8s%-8s%-8s%s%%\n",
+           progress[r_count - 1].name,
+           progress[r_count - 1].roll,
+           progress[r_count - 1].subject,
+           progress[r_count - 1].quiz_date,
+           progress[r_count - 1].total_marks,
+           progress[r_count - 1].correct_ans,
+           progress[r_count - 1].wrong_ans,
+           progress[r_count - 1].wrong_ans,
+           progress[r_count - 1].accuracy);
+    if (r_count >= 256)
+    { // resets the record in the end if the maximum limit crosses
+        FILE *reset_record = fopen("progress.dat", "wb");
+        fclose(reset_record);
+    }
 }
