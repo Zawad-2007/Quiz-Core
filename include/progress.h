@@ -12,5 +12,5 @@ void migrate_oldRecord_toNew();
 
 void show_all_progress_from_file(char *encr_progress_filepath);
 
-void decrypt_and_save_progress(char *encr_progress_filepath);
+int decrypt_and_save_progress(char *encr_progress_filepath);
 #endif

@@ -189,7 +189,7 @@ void show_all_progress_from_file(char *encr_progress_filepath)
     printf("Total records : %d\n", i);
 }
 
-void decrypt_and_save_progress(char *encr_progress_filepath)
+int decrypt_and_save_progress(char *encr_progress_filepath)
 {
     FILE *encr_progress = fopen(encr_progress_filepath, "rb");
 
@@ -226,5 +226,13 @@ void decrypt_and_save_progress(char *encr_progress_filepath)
                 qr_str_buf.wrong_ans,
                 qr_str_buf.ignored,
                 qr_str_buf.accuracy);
+    }
+    if (encr_progress == NULL || decr_progress == NULL)
+    {
+        return 1;
+    }
+    else    
+    {
+        return 0;
     }
 }
