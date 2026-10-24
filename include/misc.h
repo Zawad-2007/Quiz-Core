@@ -51,4 +51,6 @@ void decryptAndload_progress_in_mem();
 
 void migrate_oldRecord_toNew();
 
+void get_date_str(char *d_str, int size);
+
 #endif
