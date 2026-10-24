@@ -1,0 +1,8 @@
+Name                            Roll            Subject         Quiz Code                       Quiz Date                       Total   Correct Wrong   Ignored Accuracy
+Zawad                           81              DM              CSE-1107-01                     Fri Oct 23 21:54:29 2026        10      4       6       0       40.00%
+Zawad                           81              DM              CSE-1107-01                     Fri Oct 23 21:55:55 2026        10      4       6       0       40.00%
+Zawad                           81              DM              CSE-1107-01                     Fri Oct 23 22:02:15 2026        10      4       6       0       40.00%
+Zawad                           81              DM              CSE-1107-01                     Fri Oct 23 22:06:24 2026        10      4       6       0       40.00%
+Zawad                           81              DM              CSE-1107-01                     Fri Oct 23 22:16:48 2026        10      4       5       1       40.00%
+Zawad                           81              DM              CSE-1107-01                     Sat Oct 24 23:03:01 2026        10      3       5       2       30.00%
+Zawad                           81              DM              CSE-1107-01                     Sat Oct 24 23:03:53 2026        10      3       5       2       30.00%
