@@ -51,7 +51,12 @@ void handle_teacher_menu()
         }
         case 3:
         {
-            
+            char encr_progress_filepath[64];
+            printf("Enter the filepath of encrypted progress file : ");
+            fgets(encr_progress_filepath, 64, stdin);
+            rm_newl(encr_progress_filepath, 64);
+
+            decrypt_and_save_progress(encr_progress_filepath);
         }
     }
 }
