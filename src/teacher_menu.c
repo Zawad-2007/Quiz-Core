@@ -56,7 +56,17 @@ void handle_teacher_menu()
             fgets(encr_progress_filepath, 64, stdin);
             rm_newl(encr_progress_filepath, 64);
 
-            decrypt_and_save_progress(encr_progress_filepath);
+            int a = decrypt_and_save_progress(encr_progress_filepath);
+            if (a==0)
+            {
+                printf("\033[32mFile creation successfull\033[0m\n");
+            }
+            else if(a==1)
+            {
+                printf("\033[31mFile creation unsuccessfull\033[0m\n");
+            }
+            printf("Press Enter to exit\n");
+            getchar();
             break;
         }
         case 4:
