@@ -33,6 +33,7 @@ void handle_stud_menu(char *encr_ques_filepath, Question *ques_ptr, QuizResult *
             storeAndencrypt_progress_in_file(qr_ptr);
             decryptAndload_progress_in_mem();
             free(ques_ptr);
+            getchar();
             break;
         }
         case 2:

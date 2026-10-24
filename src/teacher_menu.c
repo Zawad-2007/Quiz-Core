@@ -57,6 +57,11 @@ void handle_teacher_menu()
             rm_newl(encr_progress_filepath, 64);
 
             decrypt_and_save_progress(encr_progress_filepath);
+            break;
+        }
+        case 4:
+        {
+            break;
         }
     }
 }
