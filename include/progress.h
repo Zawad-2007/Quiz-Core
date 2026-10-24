@@ -16,4 +16,6 @@ void decryptAndload_progress_in_mem();
 
 void migrate_oldRecord_toNew();
 
+void show_all_progress_from_file(FILE *progress_file);
+
 #endif

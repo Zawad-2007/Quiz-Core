@@ -71,7 +71,7 @@ void decryptAndload_progress_in_mem()
 
     QuizResultStr *progress = malloc(sizeof(QuizResultStr));
 
-    int r_count = 0;
+    int record_count = 0;
     int i = 0;
     while (fread(progress, sizeof(QuizResultStr), 1, encr_progress_file) != 0)
     {
@@ -90,14 +90,14 @@ void decryptAndload_progress_in_mem()
 
     fclose(encr_progress_file);
 
-    r_count = i; // record count
-    int record_left = 256 - r_count;
+    record_count = i; // record count
+    int record_left = 256 - record_count;
 
-    if (r_count < 256)
+    if (record_count < 256)
     {
         printf("Records will be reset after %d quiz\n", record_left);
     }
-    else if (r_count == 256)
+    else if (record_count == 256)
     {
         printf("\033[31mRecord limit maxed out\033[0m\n");
         printf("\033[32mThe progress record will be reset\nPrevious record will be saved in a file\033[0m\n");
@@ -116,13 +116,12 @@ void decryptAndload_progress_in_mem()
            progress->wrong_ans,
            progress->ignored,
            progress->accuracy);
-    if (r_count >= 256)
+    if (record_count >= 256)
     { // resets the record in the end if the maximum limit crosses
         FILE *reset_record = fopen("progress.dat", "wb");
         if (reset_record == NULL)
         {
             printf("\033[31mFile Error\033[0m\n");
-            fclose(reset_record);
             return;
         }
         fclose(reset_record);
@@ -160,4 +159,35 @@ void migrate_oldRecord_toNew()
 
     fclose(old_file);
     fclose(new_file);
+}
+
+void show_all_progress_from_file(FILE *progress_file)
+{
+    QuizResultStr qr_str;
+    while (fread(&qr_str,sizeof(QuizResultStr),1,progress_file)!=0)
+    {
+        decrypt_affine((unsigned char *)qr_str.name, sizeof(qr_str.name), 5, 2);
+        decrypt_affine((unsigned char *)qr_str.roll, sizeof(qr_str.roll), 5, 2);
+        decrypt_affine((unsigned char *)qr_str.subject, sizeof(qr_str.subject), 5, 2);
+        decrypt_affine((unsigned char *)qr_str.quiz_code, sizeof(qr_str.quiz_code), 5, 2);
+        decrypt_affine((unsigned char *)qr_str.quiz_date, sizeof(qr_str.quiz_date), 5, 2);
+        decrypt_affine((unsigned char *)qr_str.total_marks, sizeof(qr_str.total_marks), 5, 2);
+        decrypt_affine((unsigned char *)qr_str.correct_ans, sizeof(qr_str.correct_ans), 5, 2);
+        decrypt_affine((unsigned char *)qr_str.wrong_ans, sizeof(qr_str.wrong_ans), 5, 2);
+        decrypt_affine((unsigned char *)qr_str.ignored, sizeof(qr_str.ignored), 5, 2);
+        decrypt_affine((unsigned char *)qr_str.accuracy, sizeof(qr_str.accuracy), 5, 2);
+
+        printf("%-32s%-16s%-16s%-32s%-32s%-8s%-8s%-8s%-8s%s\n", "Name", "Roll", "Subject", "Quiz Code", "Quiz Date", "Total", "Correct", "Wrong", "Ignored", "Accuracy");
+        printf("%-32s%-16s%-16s%-32s%-32s%-8s%-8s%-8s%-8s%s%%\n",
+               qr_str.name,
+               qr_str.roll,
+               qr_str.subject,
+               qr_str.quiz_code,
+               qr_str.quiz_date,
+               qr_str.total_marks,
+               qr_str.correct_ans,
+               qr_str.wrong_ans,
+               qr_str.ignored,
+               qr_str.accuracy);
+    }
 }
