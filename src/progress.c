@@ -131,17 +131,8 @@ void decryptAndload_progress_in_mem()
 
 void migrate_oldRecord_toNew()
 {
-    time_t cur_time = time(NULL);
-
-    struct tm *l_time_struct_ptr = localtime(&cur_time);
-
-    int year = l_time_struct_ptr->tm_year + 1900; // tm_year counts from 1900
-    int month = l_time_struct_ptr->tm_mon + 1;    // tm_mon's month index starts from 0
-    int day = l_time_struct_ptr->tm_mday;         // tm_mday's day index starts from 1, so no additional increment
-
     char date[12];
-
-    snprintf(date, sizeof(date), "%02d-%02d-%4d", day, month, year);
+    get_date_str(date, sizeof(date));
 
     char new_file_filepath[18] = {0};
     strcpy(new_file_filepath, date);
@@ -161,10 +152,15 @@ void migrate_oldRecord_toNew()
     fclose(new_file);
 }
 
-void show_all_progress_from_file(FILE *progress_file)
+void show_all_progress_from_file(char *encr_progress_filepath)
 {
+    FILE *progress = fopen(encr_progress_filepath, "rb");
     QuizResultStr qr_str;
-    while (fread(&qr_str,sizeof(QuizResultStr),1,progress_file)!=0)
+    int i = 0;
+
+    printf("%-32s%-16s%-16s%-32s%-32s%-8s%-8s%-8s%-8s%s\n", "Name", "Roll", "Subject", "Quiz Code", "Quiz Date", "Total", "Correct", "Wrong", "Ignored", "Accuracy");
+
+    while (fread(&qr_str, sizeof(QuizResultStr), 1, progress) != 0)
     {
         decrypt_affine((unsigned char *)qr_str.name, sizeof(qr_str.name), 5, 2);
         decrypt_affine((unsigned char *)qr_str.roll, sizeof(qr_str.roll), 5, 2);
@@ -177,7 +173,6 @@ void show_all_progress_from_file(FILE *progress_file)
         decrypt_affine((unsigned char *)qr_str.ignored, sizeof(qr_str.ignored), 5, 2);
         decrypt_affine((unsigned char *)qr_str.accuracy, sizeof(qr_str.accuracy), 5, 2);
 
-        printf("%-32s%-16s%-16s%-32s%-32s%-8s%-8s%-8s%-8s%s\n", "Name", "Roll", "Subject", "Quiz Code", "Quiz Date", "Total", "Correct", "Wrong", "Ignored", "Accuracy");
         printf("%-32s%-16s%-16s%-32s%-32s%-8s%-8s%-8s%-8s%s%%\n",
                qr_str.name,
                qr_str.roll,
@@ -189,5 +184,47 @@ void show_all_progress_from_file(FILE *progress_file)
                qr_str.wrong_ans,
                qr_str.ignored,
                qr_str.accuracy);
+        i++;
+    }
+    printf("Total records : %d\n", i);
+}
+
+void decrypt_and_save_progress(char *encr_progress_filepath)
+{
+    FILE *encr_progress = fopen(encr_progress_filepath, "rb");
+
+    char decr_progress_filepath[64]="progress";
+    char date[16];
+    get_date_str(date, sizeof(date));
+    strcat(decr_progress_filepath, date);
+    strcat(decr_progress_filepath, ".txt");
+
+    FILE *decr_progress = fopen(decr_progress_filepath, "wb");
+    QuizResultStr qr_str_buf;
+
+    fprintf(decr_progress, "%-32s%-16s%-16s%-32s%-32s%-8s%-8s%-8s%-8s%s\n", "Name", "Roll", "Subject", "Quiz Code", "Quiz Date", "Total", "Correct", "Wrong", "Ignored", "Accuracy");
+    while (fread(&qr_str_buf, sizeof(QuizResultStr), 1, encr_progress) != 0)
+    {
+        decrypt_affine((unsigned char *)qr_str_buf.name, sizeof(qr_str_buf.name), 5, 2);
+        decrypt_affine((unsigned char *)qr_str_buf.roll, sizeof(qr_str_buf.roll), 5, 2);
+        decrypt_affine((unsigned char *)qr_str_buf.subject, sizeof(qr_str_buf.subject), 5, 2);
+        decrypt_affine((unsigned char *)qr_str_buf.quiz_code, sizeof(qr_str_buf.quiz_code), 5, 2);
+        decrypt_affine((unsigned char *)qr_str_buf.quiz_date, sizeof(qr_str_buf.quiz_date), 5, 2);
+        decrypt_affine((unsigned char *)qr_str_buf.total_marks, sizeof(qr_str_buf.total_marks), 5, 2);
+        decrypt_affine((unsigned char *)qr_str_buf.correct_ans, sizeof(qr_str_buf.correct_ans), 5, 2);
+        decrypt_affine((unsigned char *)qr_str_buf.wrong_ans, sizeof(qr_str_buf.wrong_ans), 5, 2);
+        decrypt_affine((unsigned char *)qr_str_buf.ignored, sizeof(qr_str_buf.ignored), 5, 2);
+        decrypt_affine((unsigned char *)qr_str_buf.accuracy, sizeof(qr_str_buf.accuracy), 5, 2);
+        fprintf(decr_progress, "%-32s%-16s%-16s%-32s%-32s%-8s%-8s%-8s%-8s%s%%\n",
+                qr_str_buf.name,
+                qr_str_buf.roll,
+                qr_str_buf.subject,
+                qr_str_buf.quiz_code,
+                qr_str_buf.quiz_date,
+                qr_str_buf.total_marks,
+                qr_str_buf.correct_ans,
+                qr_str_buf.wrong_ans,
+                qr_str_buf.ignored,
+                qr_str_buf.accuracy);
     }
 }
