@@ -11,6 +11,10 @@ int encrypt_LoginData(char *og_login_data_filepath)
 
     ClassData *cd_ptr = malloc(sizeof(ClassData));
     fscanf(og_login_data, "%s %s %s %s", cd_ptr->Dept_code, cd_ptr->batch_code, cd_ptr->section, cd_ptr->Lab_group_code);
+    int c;
+    while ((c = fgetc(og_login_data)) != '\n' && c != EOF && c != '\r')
+        ; // clearing '\n' from buffer
+
     char encr_login_data_filepath[64];
     snprintf(encr_login_data_filepath, 64, "%s-%s-%s-%s.dat", cd_ptr->Dept_code, cd_ptr->batch_code, cd_ptr->section, cd_ptr->Lab_group_code);
 
@@ -39,7 +43,7 @@ int encrypt_LoginData(char *og_login_data_filepath)
     while(fgets(line_buf,sizeof(line_buf),og_login_data)!=0)
     {
         
-        if (sscanf(line_buf, "%32[^ ] %16s %32s[^\n]", ld.name, ld.roll, ld.password) == 3)
+        if (sscanf(line_buf, "%32[^ ] %16s %32s[^\r\n]", ld.name, ld.roll, ld.password) == 3)
         {
             rm_extra_spaces(ld.name);
             encrypt_affine((unsigned char *)ld.name, sizeof(ld.name), 5, 2);
