@@ -43,7 +43,7 @@ int encrypt_LoginData(char *og_login_data_filepath)
     while(fgets(line_buf,sizeof(line_buf),og_login_data)!=0)
     {
         
-        if (sscanf(line_buf, "%32[^ ] %16s %32s[^\r\n]", ld.name, ld.roll, ld.password) == 3)
+        if (sscanf(line_buf, "%32[^ ] %16s %15s[^\r\n]", ld.name, ld.roll, ld.password) == 3)
         {
             rm_extra_spaces(ld.name);
             encrypt_affine((unsigned char *)ld.name, sizeof(ld.name), 5, 2);
@@ -64,7 +64,7 @@ int encrypt_LoginData(char *og_login_data_filepath)
     return rec_count;  //This value will be used to show user the total No. of login data records
 }
 
-void decryptAndsave_LoginData(char *encr_login_data_filepath)
+int decryptAndloadInmem_LoginData(char *encr_login_data_filepath)
 {
     FILE *encr_login_data = fopen(encr_login_data_filepath, "rb");
     if(encr_login_data==NULL)
@@ -72,34 +72,41 @@ void decryptAndsave_LoginData(char *encr_login_data_filepath)
         printf("\033[31mFile Error\033[0m\n");
         return -1;
     }
-    ClassData cd;
-    fread(&cd, sizeof(ClassData), 1, encr_login_data);
-
-    decrypt_affine((unsigned char *)cd.Dept_code, 8, 5, 2);
-    decrypt_affine((unsigned char *)cd.batch_code, 8, 5, 2);
-    decrypt_affine((unsigned char *)cd.section, 8, 5, 2);
-    decrypt_affine((unsigned char *)cd.Lab_group_code, 8, 5, 2);
-    printf("Department Code : %s\n", cd.Dept_code);
-    printf("Batch Code      : %s\n", cd.batch_code);
-    printf("Section         : %s\n", cd.section);
-    printf("Lab Group Code  : %s\n", cd.Lab_group_code);
-
-    printf("\n%-32s%-16s%-16s%\n", "Name", "Roll", "Password");
-
-    LoginDta ld;
-
-    int i = 0;
-    while(fread(&ld, sizeof(LoginDta), 1, encr_login_data)!=0)
+    else
     {
-        decrypt_affine((unsigned char *)ld.name, sizeof(ld.name), 5, 2);
-        decrypt_affine((unsigned char *)ld.roll, sizeof(ld.roll), 5, 2);
-        decrypt_affine((unsigned char *)ld.password, sizeof(ld.password), 5, 2);
+        ClassData cd;
+        fread(&cd, sizeof(ClassData), 1, encr_login_data);
 
-        printf("%-32s%-16s%-16s%\n", ld.name, ld.roll, ld.password);
+        decrypt_affine((unsigned char *)cd.Dept_code, 8, 5, 2);
+        decrypt_affine((unsigned char *)cd.batch_code, 8, 5, 2);
+        decrypt_affine((unsigned char *)cd.section, 8, 5, 2);
+        decrypt_affine((unsigned char *)cd.Lab_group_code, 8, 5, 2);
+        printf("Department Code : %s\n", cd.Dept_code);
+        printf("Batch Code      : %s\n", cd.batch_code);
+        printf("Section         : %s\n", cd.section);
+        printf("Lab Group Code  : %s\n", cd.Lab_group_code);
+
+        printf("\n");
+        printf("%-32s%-16s%-16s", "Name", "Roll", "Password");
+        printf("\n");
+
+        LoginDta ld;
+
+        int rec_count = 0;
+        while (fread(&ld, sizeof(LoginDta), 1, encr_login_data) != 0)
+        {
+            decrypt_affine((unsigned char *)ld.name, sizeof(ld.name), 5, 2);
+            decrypt_affine((unsigned char *)ld.roll, sizeof(ld.roll), 5, 2);
+            decrypt_affine((unsigned char *)ld.password, sizeof(ld.password), 5, 2);
+            rec_count++;
+
+            printf("%-32s%-16s%-16s\n", ld.name, ld.roll, ld.password);
+        }
+        return rec_count;
     }
 }
 
-void decryptAndsave_LoginData(char *encr_login_data_filepath)
+int decryptAndsave_LoginData(char *encr_login_data_filepath)
 {
     FILE *encr_login_data = fopen(encr_login_data_filepath, "rb");
 
@@ -128,17 +135,19 @@ void decryptAndsave_LoginData(char *encr_login_data_filepath)
         return -1;
     }
 
-    fprintf(decr_login_data, "%-32s%-16s%s%\n", "Name", "Roll", "Password");
+    fprintf(decr_login_data, "%-32s%-16s%s\n", "Name", "Roll", "Password");
 
     LoginDta ld;
 
-    int i = 0;
+    int rec_count = 0;
     while (fread(&ld, sizeof(LoginDta), 1, encr_login_data) != 0)
     {
         decrypt_affine((unsigned char *)ld.name, sizeof(ld.name), 5, 2);
         decrypt_affine((unsigned char *)ld.roll, sizeof(ld.roll), 5, 2);
         decrypt_affine((unsigned char *)ld.password, sizeof(ld.password), 5, 2);
 
-        fprintf(decr_login_data, "%-32s%-16s%-16s%\n", ld.name, ld.roll, ld.password);
+        fprintf(decr_login_data, "%-32s%-16s%-16s\n", ld.name, ld.roll, ld.password);
+        rec_count++;
     }
+    return rec_count;
 }
