@@ -45,11 +45,7 @@ typedef struct
 
 void rm_newl(char *string, int lenght);
 
-void storeAndencrypt_progress_in_file(QuizResult *progress);
-
-void decryptAndload_progress_in_mem();
-
-void migrate_oldRecord_toNew();
+void rm_extra_spaces(char *str);
 
 void get_date_str(char *d_str, int size);
 

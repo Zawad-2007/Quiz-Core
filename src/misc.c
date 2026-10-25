@@ -13,6 +13,16 @@ void rm_newl(char *string, int lenght)
     }
 }
 
+void rm_extra_spaces(char *str)
+{
+    int len = strlen(str);
+    while (len > 0 && isspace((unsigned char)str[len - 1]))
+    {
+        str[len - 1] = '\0';
+        len--;
+    }
+}
+
 void get_date_str(char *d_str, int size)
 {
     time_t cur_time = time(NULL);

@@ -65,7 +65,6 @@ void decryptAndload_progress_in_mem()
     if (encr_progress_file == NULL)
     {
         printf("\033[31mFile Error\033[0m\n");
-        fclose(encr_progress_file);
         return;
     }
 
