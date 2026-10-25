@@ -12,7 +12,7 @@ int encrypt_LoginData(char *og_login_data_filepath)
     ClassData *cd_ptr = malloc(sizeof(ClassData));
     fscanf(og_login_data, "%s %s %s %s", cd_ptr->Dept_code, cd_ptr->batch_code, cd_ptr->section, cd_ptr->Lab_group_code);
     int c;
-    while ((c = fgetc(og_login_data)) != '\n' && c != EOF && c != '\r')
+    while ((c = fgetc(og_login_data)) != '\n' && c != '\r')
         ; // clearing '\n' from buffer
 
     char encr_login_data_filepath[64];
@@ -37,7 +37,7 @@ int encrypt_LoginData(char *og_login_data_filepath)
 
     LoginDta ld;
 
-    int i = 0;
+    int rec_count = 0;
 
     char line_buf[128];
     while(fgets(line_buf,sizeof(line_buf),og_login_data)!=0)
@@ -53,14 +53,48 @@ int encrypt_LoginData(char *og_login_data_filepath)
         }
         else
         {
-            printf("There is more or less data than needed in record No. %d\n", i+1);
-            return -2;
+            return -2;//Not enough data of a student's login info
         }
-        i++;
+        rec_count++;
     }
 
     fclose(og_login_data);
     fclose(encr_login_data);
 
-    return i;
+    return rec_count;  //This value will be used to show user the total No. of login data records
+}
+
+void decryptAndloadInmem_LoginData(char *encr_login_data_filepath)
+{
+    FILE *encr_login_data = fopen(encr_login_data_filepath, "rb");
+    if(encr_login_data==NULL)
+    {
+        printf("\033[31mFile Error\033[0m\n");
+        return -1;
+    }
+    ClassData cd;
+    fread(&cd, sizeof(ClassData), 1, encr_login_data);
+
+    decrypt_affine((unsigned char *)cd.Dept_code, 8, 5, 2);
+    decrypt_affine((unsigned char *)cd.batch_code, 8, 5, 2);
+    decrypt_affine((unsigned char *)cd.section, 8, 5, 2);
+    decrypt_affine((unsigned char *)cd.Lab_group_code, 8, 5, 2);
+    printf("Department Code : %s\n", cd.Dept_code);
+    printf("Batch Code      : %s\n", cd.batch_code);
+    printf("Section         : %s\n", cd.section);
+    printf("Lab Group Code  : %s\n", cd.Lab_group_code);
+
+    printf("\n%-32s%-16s%-16s%\n", "Name", "Roll", "Password");
+
+    LoginDta ld;
+
+    int i = 0;
+    while(fread(&ld, sizeof(LoginDta), 1, encr_login_data)!=0)
+    {
+        decrypt_affine((unsigned char *)ld.name, sizeof(ld.name), 5, 2);
+        decrypt_affine((unsigned char *)ld.roll, sizeof(ld.roll), 5, 2);
+        decrypt_affine((unsigned char *)ld.password, sizeof(ld.password), 5, 2);
+
+        printf("%-32s%-16s%-16s%\n", ld.name, ld.roll, ld.password);
+    }
 }
