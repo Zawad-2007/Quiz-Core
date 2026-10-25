@@ -64,7 +64,7 @@ int encrypt_LoginData(char *og_login_data_filepath)
     return rec_count;  //This value will be used to show user the total No. of login data records
 }
 
-void decryptAndloadInmem_LoginData(char *encr_login_data_filepath)
+void decryptAndsave_LoginData(char *encr_login_data_filepath)
 {
     FILE *encr_login_data = fopen(encr_login_data_filepath, "rb");
     if(encr_login_data==NULL)
@@ -96,5 +96,49 @@ void decryptAndloadInmem_LoginData(char *encr_login_data_filepath)
         decrypt_affine((unsigned char *)ld.password, sizeof(ld.password), 5, 2);
 
         printf("%-32s%-16s%-16s%\n", ld.name, ld.roll, ld.password);
+    }
+}
+
+void decryptAndsave_LoginData(char *encr_login_data_filepath)
+{
+    FILE *encr_login_data = fopen(encr_login_data_filepath, "rb");
+
+    if (encr_login_data == NULL)
+    {
+        printf("\033[31mFile Error\033[0m\n");
+        return -1;
+    }
+
+    
+    ClassData cd;
+    fread(&cd, sizeof(ClassData), 1, encr_login_data);
+
+    decrypt_affine((unsigned char *)cd.Dept_code, 8, 5, 2);
+    decrypt_affine((unsigned char *)cd.batch_code, 8, 5, 2);
+    decrypt_affine((unsigned char *)cd.section, 8, 5, 2);
+    decrypt_affine((unsigned char *)cd.Lab_group_code, 8, 5, 2);
+
+     
+    char decr_login_data_filepath[64];
+    snprintf(decr_login_data_filepath, 64, "%s-%s-%s-%s.txt", cd.Dept_code, cd.batch_code, cd.section, cd.Lab_group_code);
+    FILE *decr_login_data = fopen(decr_login_data_filepath, "wb");
+    if (decr_login_data == NULL)
+    {
+        printf("\033[31mFile Error\033[0m\n");
+        return -1;
+    }
+
+    fprintf(decr_login_data, "%-32s%-16s%s%\n", "Name", "Roll", "Password");
+
+    LoginDta ld;
+
+    int i = 0;
+    while (fread(&ld, sizeof(LoginDta), 1, encr_login_data) != 0)
+    {
+        decrypt_affine((unsigned char *)ld.name, sizeof(ld.name), 5, 2);
+        decrypt_affine((unsigned char *)ld.roll, sizeof(ld.roll), 5, 2);
+        decrypt_affine((unsigned char *)ld.password, sizeof(ld.password), 5, 2);
+
+        fprintf(decr_login_data, "%-32s%-16s%-16s%\n", ld.name, ld.roll, ld.password);
     }
 }

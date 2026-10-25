@@ -24,4 +24,8 @@ typedef struct
 
 int encrypt_LoginData(char *og_login_data_filepath);
 
+void decryptAndsave_LoginData(char *encr_login_data_filepath);
+
+void decryptAndsave_LoginData(char *encr_login_data_filepath);
+
 #endif
