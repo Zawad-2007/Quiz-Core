@@ -47,22 +47,40 @@ int encrypt_TeacherLoginData(char *og_login_data_filepath)
     char line_buf[128];
     while (fgets(line_buf, sizeof(line_buf), og_login_data) != 0)
     {
+        char *ptr[] = {ld.name, ld.dept_code, ld.designation_code, ld.joining_date, ld.password};
 
-        if (sscanf(line_buf, "%32[^ ] %8s %16s %32s %15s[^\r\n]", ld.name, ld.dept_code, ld.designation_code, ld.joining_date, ld.password) == 5)
-        {
-            rm_extra_spaces(ld.name);
-            encrypt_affine((unsigned char *)ld.name, sizeof(ld.name), 5, 2);
-            encrypt_affine((unsigned char *)ld.dept_code, sizeof(ld.dept_code), 5, 2);
-            encrypt_affine((unsigned char *)ld.designation_code, sizeof(ld.designation_code), 5, 2);
-            encrypt_affine((unsigned char *)ld.joining_date, sizeof(ld.joining_date), 5, 2);
-            encrypt_affine((unsigned char *)ld.password, sizeof(ld.password), 5, 2);
-            fwrite(&ld, sizeof(TeacherLoginDta), 1, encr_login_data);
+        int i = 0; //get the first token
+        char *token = strtok(line_buf, ",");
+
+        
+        while (token != NULL && i < 5)
+        {//loop condition : valid token && array index check
+            strcpy(ptr[i], token);
+
+            i++;
+            token = strtok(NULL, ","); //grabbing the next token at the end of iteration
         }
-        else
+
+        
+        if (i != 5)
         {
-            printf("Not enough element of a teacher's login data\n");
-            return -4; // Not enough element of a teacher's login data
+            printf("More or less element in the teacher login data of index %d\n", rec_count + 1);
+            return -5;
         }
+
+        rm_extra_spaces(ld.name);
+        rm_extra_spaces(ld.dept_code);
+        rm_extra_spaces(ld.designation_code);
+        rm_extra_spaces(ld.joining_date);
+        rm_extra_spaces(ld.password);
+        rm_newl(ld.password, 16);
+
+        encrypt_affine((unsigned char *)ld.name, sizeof(ld.name), 5, 2);
+        encrypt_affine((unsigned char *)ld.dept_code, sizeof(ld.dept_code), 5, 2);
+        encrypt_affine((unsigned char *)ld.designation_code, sizeof(ld.designation_code), 5, 2);
+        encrypt_affine((unsigned char *)ld.joining_date, sizeof(ld.joining_date), 5, 2);
+        encrypt_affine((unsigned char *)ld.password, sizeof(ld.password), 5, 2);
+        fwrite(&ld, sizeof(TeacherLoginDta), 1, encr_login_data);
         rec_count++;
     }
     return rec_count;
