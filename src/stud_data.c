@@ -10,8 +10,12 @@ int encrypt_StudentLoginData(char *og_login_data_filepath)
     }
 
     ClassData cd;
-    fscanf(og_login_data, "%s %s %s %s", cd.Dept_code, cd.batch_code, cd.section, cd.Lab_group_code);
-    int c;
+    if (fscanf(og_login_data, "%s %s %s %s", cd.Dept_code, cd.batch_code, cd.section, cd.Lab_group_code)!=4)
+    {
+        printf("\033[31mDept_code, batch_code, section and Lab_group_code not written\033[0m\n");
+        return -2;
+    }
+        int c;
     while ((c = fgetc(og_login_data)) != '\n' && c != '\r')
         ; // clearing '\n' from buffer
 
@@ -35,6 +39,8 @@ int encrypt_StudentLoginData(char *og_login_data_filepath)
             fclose(file_already_exists);
         }
     }
+
+    printf("%s created\n", encr_login_data_filepath);
 
     FILE *encr_login_data = fopen(encr_login_data_filepath, "wb");
     if (encr_login_data == NULL)
@@ -71,7 +77,8 @@ int encrypt_StudentLoginData(char *og_login_data_filepath)
         }
         else
         {
-            return -4;//Not enough data of a student's login info
+            printf("Not enough element of a student's login data\n");
+            return -4; // Not enough element of a student's login data
         }
         rec_count++;
     }
@@ -198,6 +205,8 @@ int append_encrypted_StudentLoginData(char *encr_login_data_filepath)
             printf("Lab Group Code  : %s\n", cd.Lab_group_code);
 
             fclose(file_exists);
+
+            return 0;
         }
         else
         {
