@@ -1,5 +1,6 @@
 #include"../include/stud_data.h"
 
+
 int encrypt_StudentLoginData(char *og_login_data_filepath)
 {
     FILE *og_login_data = fopen(og_login_data_filepath, "rb");
@@ -66,20 +67,28 @@ int encrypt_StudentLoginData(char *og_login_data_filepath)
     char line_buf[128];
     while(fgets(line_buf,sizeof(line_buf),og_login_data)!=0)
     {
-        
-        if (sscanf(line_buf, "%32[^ ] %16s %15s[^\r\n]", ld.name, ld.roll, ld.password) == 3)
-        {
-            rm_extra_spaces(ld.name);
-            encrypt_affine((unsigned char *)ld.name, sizeof(ld.name), 5, 2);
-            encrypt_affine((unsigned char *)ld.roll, sizeof(ld.roll), 5, 2);
-            encrypt_affine((unsigned char *)ld.password, sizeof(ld.password), 5, 2);
-            fwrite(&ld, sizeof(StudentLoginDta), 1, encr_login_data);
-        }
-        else
-        {
-            printf("Not enough element of a student's login data\n");
-            return -4; // Not enough element of a student's login data
-        }
+        int tok_count = 0;
+        char *token;
+
+        token = strtok(line_buf, ",");
+        if(token!=NULL)strcpy(ld.name, token);
+        else continue;
+        token = strtok(NULL, ",");
+        if (token != NULL)strcpy(ld.roll, token);
+        else continue;
+        token = strtok(NULL, ",");
+        if (token != NULL) strcpy(ld.password, token);
+        else continue;
+
+        rm_extra_spaces(ld.name);
+        rm_extra_spaces(ld.roll);
+        rm_extra_spaces(ld.password);
+        rm_newl(ld.password, 16);
+
+        encrypt_affine((unsigned char *)ld.name, sizeof(ld.name), 5, 2);
+        encrypt_affine((unsigned char *)ld.roll, sizeof(ld.roll), 5, 2);
+        encrypt_affine((unsigned char *)ld.password, sizeof(ld.password), 5, 2);
+        fwrite(&ld, sizeof(StudentLoginDta), 1, encr_login_data);
         rec_count++;
     }
 
