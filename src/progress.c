@@ -68,22 +68,22 @@ void decryptAndload_progress_in_mem()
         return;
     }
 
-    QuizResultStr *progress = malloc(sizeof(QuizResultStr));
+    QuizResultStr progress;
 
     int record_count = 0;
     int i = 0;
-    while (fread(progress, sizeof(QuizResultStr), 1, encr_progress_file) != 0)
+    while (fread(&progress, sizeof(QuizResultStr), 1, encr_progress_file) != 0)
     {
-        decrypt_affine((unsigned char *)progress->name, 32, 5, 2);
-        decrypt_affine((unsigned char *)progress->roll, 16, 5, 2);
-        decrypt_affine((unsigned char *)progress->subject, 32, 5, 2);
-        decrypt_affine((unsigned char *)progress->quiz_code, 16, 5, 2);
-        decrypt_affine((unsigned char *)progress->quiz_date, 32, 5, 2);
-        decrypt_affine((unsigned char *)progress->total_marks, 8, 5, 2);
-        decrypt_affine((unsigned char *)progress->correct_ans, 8, 5, 2);
-        decrypt_affine((unsigned char *)progress->wrong_ans, 8, 5, 2);
-        decrypt_affine((unsigned char *)progress->ignored, 8, 5, 2);
-        decrypt_affine((unsigned char *)progress->accuracy, 8, 5, 2);
+        decrypt_affine((unsigned char *)progress.name, 32, 5, 2);
+        decrypt_affine((unsigned char *)progress.roll, 16, 5, 2);
+        decrypt_affine((unsigned char *)progress.subject, 32, 5, 2);
+        decrypt_affine((unsigned char *)progress.quiz_code, 16, 5, 2);
+        decrypt_affine((unsigned char *)progress.quiz_date, 32, 5, 2);
+        decrypt_affine((unsigned char *)progress.total_marks, 8, 5, 2);
+        decrypt_affine((unsigned char *)progress.correct_ans, 8, 5, 2);
+        decrypt_affine((unsigned char *)progress.wrong_ans, 8, 5, 2);
+        decrypt_affine((unsigned char *)progress.ignored, 8, 5, 2);
+        decrypt_affine((unsigned char *)progress.accuracy, 8, 5, 2);
         i++;
     }
 
@@ -105,16 +105,16 @@ void decryptAndload_progress_in_mem()
 
     printf("%-32s%-16s%-16s%-32s%-32s%-8s%-8s%-8s%-8s%s\n", "Name", "Roll", "Subject", "Quiz Code", "Quiz Date", "Total", "Correct", "Wrong", "Ignored", "Accuracy");
     printf("%-32s%-16s%-16s%-32s%-32s%-8s%-8s%-8s%-8s%s%%\n",
-           progress->name,
-           progress->roll,
-           progress->subject,
-           progress->quiz_code,
-           progress->quiz_date,
-           progress->total_marks,
-           progress->correct_ans,
-           progress->wrong_ans,
-           progress->ignored,
-           progress->accuracy);
+           progress.name,
+           progress.roll,
+           progress.subject,
+           progress.quiz_code,
+           progress.quiz_date,
+           progress.total_marks,
+           progress.correct_ans,
+           progress.wrong_ans,
+           progress.ignored,
+           progress.accuracy);
     if (record_count >= 256)
     { // resets the record in the end if the maximum limit crosses
         FILE *reset_record = fopen("progress.dat", "wb");
@@ -125,7 +125,6 @@ void decryptAndload_progress_in_mem()
         }
         fclose(reset_record);
     }
-    free(progress);
 }
 
 void migrate_oldRecord_toNew()

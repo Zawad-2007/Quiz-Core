@@ -1,6 +1,6 @@
-#include"../include/login.h"
+#include"../include/stud_login.h"
 
-int encrypt_LoginData(char *og_login_data_filepath)
+int encrypt_StudentLoginData(char *og_login_data_filepath)
 {
     FILE *og_login_data = fopen(og_login_data_filepath, "rb");
     if(og_login_data==NULL)
@@ -35,7 +35,7 @@ int encrypt_LoginData(char *og_login_data_filepath)
     fgets(unnecessary_line, 256, og_login_data);       
     free(unnecessary_line);
 
-    LoginDta ld;
+    StudentLoginDta ld;
 
     int rec_count = 0;
 
@@ -49,7 +49,7 @@ int encrypt_LoginData(char *og_login_data_filepath)
             encrypt_affine((unsigned char *)ld.name, sizeof(ld.name), 5, 2);
             encrypt_affine((unsigned char *)ld.roll, sizeof(ld.roll), 5, 2);
             encrypt_affine((unsigned char *)ld.password, sizeof(ld.password), 5, 2);
-            fwrite(&ld, sizeof(LoginDta), 1, encr_login_data);
+            fwrite(&ld, sizeof(StudentLoginDta), 1, encr_login_data);
         }
         else
         {
@@ -64,7 +64,7 @@ int encrypt_LoginData(char *og_login_data_filepath)
     return rec_count;  //This value will be used to show user the total No. of login data records
 }
 
-int decryptAndloadInmem_LoginData(char *encr_login_data_filepath)
+int decryptAndloadInmem_StudentLoginData(char *encr_login_data_filepath)
 {
     FILE *encr_login_data = fopen(encr_login_data_filepath, "rb");
     if(encr_login_data==NULL)
@@ -90,10 +90,10 @@ int decryptAndloadInmem_LoginData(char *encr_login_data_filepath)
         printf("%-32s%-16s%-16s", "Name", "Roll", "Password");
         printf("\n");
 
-        LoginDta ld;
+        StudentLoginDta ld;
 
         int rec_count = 0;
-        while (fread(&ld, sizeof(LoginDta), 1, encr_login_data) != 0)
+        while (fread(&ld, sizeof(StudentLoginDta), 1, encr_login_data) != 0)
         {
             decrypt_affine((unsigned char *)ld.name, sizeof(ld.name), 5, 2);
             decrypt_affine((unsigned char *)ld.roll, sizeof(ld.roll), 5, 2);
@@ -106,7 +106,7 @@ int decryptAndloadInmem_LoginData(char *encr_login_data_filepath)
     }
 }
 
-int decryptAndsave_LoginData(char *encr_login_data_filepath)
+int decryptAndsave_StudentLoginData(char *encr_login_data_filepath)
 {
     FILE *encr_login_data = fopen(encr_login_data_filepath, "rb");
 
@@ -137,10 +137,10 @@ int decryptAndsave_LoginData(char *encr_login_data_filepath)
 
     fprintf(decr_login_data, "%-32s%-16s%s\n", "Name", "Roll", "Password");
 
-    LoginDta ld;
+    StudentLoginDta ld;
 
     int rec_count = 0;
-    while (fread(&ld, sizeof(LoginDta), 1, encr_login_data) != 0)
+    while (fread(&ld, sizeof(StudentLoginDta), 1, encr_login_data) != 0)
     {
         decrypt_affine((unsigned char *)ld.name, sizeof(ld.name), 5, 2);
         decrypt_affine((unsigned char *)ld.roll, sizeof(ld.roll), 5, 2);
