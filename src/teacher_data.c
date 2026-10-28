@@ -92,8 +92,9 @@ int encrypt_TeacherLoginData(char *og_login_data_filepath)
     return rec_count;
 }
 
-int decryptAndloadInmem_TeacherLoginData(char *encr_login_data_filepath, TeacherLoginDta *ld_ptr, int ld_buf_size)
+int decryptAndloadInmem_TeacherLoginData(char *encr_login_data_filepath, TeacherLoginDta **ld_ptr_addr, int ld_buf_size)
 {
+    TeacherLoginDta *ld_ptr = *ld_ptr_addr;
     FILE *encr_login_data = fopen(encr_login_data_filepath, "rb");
     if (encr_login_data == NULL)
     {
@@ -114,15 +115,16 @@ int decryptAndloadInmem_TeacherLoginData(char *encr_login_data_filepath, Teacher
             i++;
             if (i >= ld_buf_size)
             {
-                TeacherLoginDta *temp = realloc(ld_ptr, (i + 1) * sizeof(TeacherLoginDta));
+                TeacherLoginDta *temp =(TeacherLoginDta *) realloc(ld_ptr, (i + 1) * sizeof(TeacherLoginDta));
                 if (temp == NULL)
                 {
+                    fclose(encr_login_data);
                     return -1;
                 }
                 else
                 {
                     ld_ptr = temp;
-                    // This mem address must be freed afterwards
+                    *ld_ptr_addr = temp;
                 }
             }
         }

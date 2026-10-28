@@ -19,7 +19,7 @@ typedef struct
 
 int encrypt_TeacherLoginData(char *og_login_data_filepath);
 
-int decryptAndloadInmem_TeacherLoginData(char *encr_login_data_filepath, TeacherLoginDta *ld_ptr, int ld_buf_size);
+int decryptAndloadInmem_TeacherLoginData(char *encr_login_data_filepath, TeacherLoginDta **ld_ptr_aadr, int ld_buf_size);
 
 int decryptAndsave_TeacherLoginData(char *encr_login_data_filepath);
 

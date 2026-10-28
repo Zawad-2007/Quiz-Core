@@ -105,10 +105,12 @@ int encrypt_StudentLoginData(char *og_login_data_filepath)
     return rec_count;  //This value will be used to show user the total No. of login data records
 }
 
-int decryptAndloadInmem_StudentLoginData(char *encr_login_data_filepath, ClassData *cd_ptr, StudentLoginDta *ld_ptr,int ld_buf_size)
+int decryptAndloadInmem_StudentLoginData(char *encr_login_data_filepath, ClassData *cd_ptr, StudentLoginDta **ld_ptr_addr,int ld_buf_size)
 {/*Decrypts from an encrypted file and keeps them on given Struct Addresses*/
+    StudentLoginDta *ld_ptr = *ld_ptr_addr;
     FILE *encr_login_data = fopen(encr_login_data_filepath, "rb");
-    if(encr_login_data==NULL)
+
+    if (encr_login_data == NULL)
     {
         printf("\033[31mFile Error\033[0m\n");
         return -1;
@@ -131,18 +133,18 @@ int decryptAndloadInmem_StudentLoginData(char *encr_login_data_filepath, ClassDa
             i++;
             if(i>=ld_buf_size)
             {
-                StudentLoginDta *temp = realloc(ld_ptr, (i + 1) * sizeof(StudentLoginDta));
-                if(temp==NULL)
+                ld_buf_size = i + 5; // Expand memory for 5 more records
+                StudentLoginDta *temp = realloc(ld_ptr, ld_buf_size * sizeof(StudentLoginDta));
+                if (temp == NULL)
                 {
+                    fclose(encr_login_data);
                     return -2;
                 }
-                else
-                {
-                    ld_ptr = temp;
-                    //This mem address must be freed afterwards
-                }
+                ld_ptr = temp;
+                *ld_ptr_addr = temp;
             }
         }
+        fclose(encr_login_data);
         return i;
     }
 }
@@ -207,6 +209,11 @@ int append_encrypted_StudentLoginData(char *encr_login_data_filepath)
         ClassData cd;
         if (fread(&cd, sizeof(ClassData), 1, file_exists) != 0)
         {
+            decrypt_affine((unsigned char *)cd.Dept_code, 8, 5, 2);
+            decrypt_affine((unsigned char *)cd.batch_code, 8, 5, 2);
+            decrypt_affine((unsigned char *)cd.section, 8, 5, 2);
+            decrypt_affine((unsigned char *)cd.Lab_group_code, 8, 5, 2);
+
             printf("Class Data :\n");
             printf("Department Code : %s\n", cd.Dept_code);
             printf("Batch Code      : %s\n", cd.batch_code);
@@ -214,8 +221,6 @@ int append_encrypted_StudentLoginData(char *encr_login_data_filepath)
             printf("Lab Group Code  : %s\n", cd.Lab_group_code);
 
             fclose(file_exists);
-
-            return 0;
         }
         else
         {
@@ -228,6 +233,11 @@ int append_encrypted_StudentLoginData(char *encr_login_data_filepath)
         while (1)
         {
             FILE *encr_login_data = fopen(encr_login_data_filepath, "ab");
+            if(encr_login_data==NULL)
+            {
+                printf("\033[31mFile Error\033[0m\n");
+                return -3;
+            }
             StudentLoginDta ld;
             printf("Name     : ");
             fgets(ld.name, sizeof(ld.name), stdin);
@@ -267,6 +277,9 @@ int append_encrypted_StudentLoginData(char *encr_login_data_filepath)
                 printf("Wrong option.\n");
                 continue;
             }
+            fclose(encr_login_data);
         }
+        
     }
+    return 0;
 }

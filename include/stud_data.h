@@ -25,8 +25,10 @@ typedef struct
 
 int encrypt_StudentLoginData(char *og_login_data_filepath);
 
-int decryptAndloadInmem_StudentLoginData(char *encr_login_data_filepath, ClassData *cd_ptr, StudentLoginDta *ld_ptr, int ld_buf_size);
+int decryptAndloadInmem_StudentLoginData(char *encr_login_data_filepath, ClassData *cd_ptr, StudentLoginDta **ld_ptr_addr, int ld_buf_size);
 
 int decryptAndsave_StudentLoginData(char *encr_login_data_filepath);
+
+int append_encrypted_StudentLoginData(char *encr_login_data_filepath);
 
 #endif
