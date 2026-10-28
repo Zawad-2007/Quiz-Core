@@ -16,10 +16,29 @@ void rm_newl(char *string, int lenght)
 void rm_extra_spaces(char *str)
 {
     int len = strlen(str);
+    int n = len;
     while (len > 0 && isspace((unsigned char)str[len - 1]))
     {
         str[len - 1] = '\0';
         len--;
+    }
+    int space_count = 0;//counts number of spaces from beginning of the string
+    for (int i = 0; i < n; i++)
+    {
+        if(isspace(str[i]))
+        {
+            space_count++;
+        }
+        else
+        {
+            break;
+        } 
+    }
+
+    char temp;
+    for (int i = 0; i < n-space_count; i++)
+    {
+        str[i] = str[i + space_count];
     }
 }
 
