@@ -18,3 +18,4 @@ The time complexity of accessing an element in an array by its index is O(______
 1
 In relational databases, SQL stands for Structured _______ Language.
 Query
+

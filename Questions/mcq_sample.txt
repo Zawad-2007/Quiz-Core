@@ -58,3 +58,4 @@ B) If not p, then not q
 C) If not q, then not p
 D) If p, then not q
 C
+

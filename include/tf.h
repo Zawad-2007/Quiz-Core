@@ -25,3 +25,4 @@ int decryptAndload_tf_question(char encrypted_filepath[], TFQuestion *q, Questio
 void run_tf_quiz(TFQuestion *decrypted_q_ptr, QuizResult *qr_ptr, int ques_count, QuestionHeader *ques_head);
 
 #endif
+

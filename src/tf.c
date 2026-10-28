@@ -205,3 +205,4 @@ void run_tf_quiz(TFQuestion *decrypted_q_ptr, QuizResult *qr_ptr, int ques_count
     printf("Accuracy        : %.2f%%\n", qr_ptr->accuracy);
     printf("==================================================\n\n");
 }
+

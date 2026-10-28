@@ -214,3 +214,4 @@ void run_blank_quiz(BlankQuestion *decrypted_q_ptr, QuizResult *qr_ptr, int ques
     printf("Accuracy        : %.2f%%\n", qr_ptr->accuracy);
     printf("==================================================\n\n");
 }
+

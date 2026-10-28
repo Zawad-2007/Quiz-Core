@@ -25,3 +25,4 @@ int decryptAndload_blank_question(char encrypted_filepath[], BlankQuestion *q, Q
 void run_blank_quiz(BlankQuestion *decrypted_q_ptr, QuizResult *qr_ptr, int ques_count, QuestionHeader *ques_head);
 
 #endif
+
