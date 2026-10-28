@@ -1,4 +1,14 @@
 #include "../include/misc.h"
+#include <errno.h>
+
+void print_file_err(void)
+{
+    printf(ERR_STR);
+    if (errno != 0)
+    {
+        printf("\033[31m%s\033[0m\n", strerror(errno));
+    }
+}
 
 
 void rm_newl(char *string, int lenght)

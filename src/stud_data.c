@@ -6,7 +6,7 @@ int encrypt_StudentLoginData(char *og_login_data_filepath)
     FILE *og_login_data = fopen(og_login_data_filepath, "rb");
     if(og_login_data==NULL)
     {
-        printf("\033[31mFile Error\033[0m\n");
+        print_file_err();
         return -1;
     }
 
@@ -46,7 +46,7 @@ int encrypt_StudentLoginData(char *og_login_data_filepath)
     FILE *encr_login_data = fopen(encr_login_data_filepath, "wb");
     if (encr_login_data == NULL)
     {
-        printf("\033[31mFile Error\033[0m\n");
+        print_file_err();
         return -3;
     }
     encrypt_affine((unsigned char *)cd.Dept_code, 8, 5, 2);
@@ -111,7 +111,7 @@ int decryptAndloadInmem_StudentLoginData(char *encr_login_data_filepath, ClassDa
 
     if (encr_login_data == NULL)
     {
-        printf("\033[31mFile Error\033[0m\n");
+        print_file_err();
         return -1;
     }
     else
@@ -154,7 +154,7 @@ int decryptAndsave_StudentLoginData(char *encr_login_data_filepath)
 
     if (encr_login_data == NULL)
     {
-        printf("\033[31mFile Error\033[0m\n");
+        print_file_err();
         return -1;
     }
 
@@ -173,7 +173,7 @@ int decryptAndsave_StudentLoginData(char *encr_login_data_filepath)
     FILE *decr_login_data = fopen(decr_login_data_filepath, "wb");
     if (decr_login_data == NULL)
     {
-        printf("\033[31mFile Error\033[0m\n");
+        print_file_err();
         return -1;
     }
 
@@ -199,7 +199,7 @@ int append_encrypted_StudentLoginData(char *encr_login_data_filepath)
     FILE *file_exists = fopen(encr_login_data_filepath, "rb");
     if (!(file_exists))
     {
-        printf("\033[31mFile does not exist\033[0m\n");
+        print_file_err();
         return -1;
     }
     else

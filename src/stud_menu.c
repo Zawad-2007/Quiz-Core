@@ -59,11 +59,7 @@ void handle_stud_menu(StudentLoginDta *student)
             }
 
             char encr_ques_filepath[64];
-            const char *default_path = (quiz_type == 1) ? "dm_e.dat" :
-                                       (quiz_type == 2) ? "Questions/tf_sample.dat" :
-                                                          "Questions/blank_sample.dat";
-
-            printf("\nEnter filepath of encrypted questions [default: %s]: ", default_path);
+            printf("\nEnter filepath of encrypted questions: ");
             if (fgets(encr_ques_filepath, sizeof(encr_ques_filepath), stdin) == NULL)
             {
                 break;
@@ -72,16 +68,28 @@ void handle_stud_menu(StudentLoginDta *student)
             rm_extra_spaces(encr_ques_filepath);
             if (strlen(encr_ques_filepath) == 0)
             {
-                strncpy(encr_ques_filepath, default_path, sizeof(encr_ques_filepath) - 1);
-                encr_ques_filepath[sizeof(encr_ques_filepath) - 1] = '\0';
+                print_file_err();
+                printf("Press Enter to continue...");
+                getchar();
+                break;
             }
+
+            FILE *f_check = fopen(encr_ques_filepath, "rb");
+            if (f_check == NULL)
+            {
+                print_file_err();
+                printf("Press Enter to continue...");
+                getchar();
+                break;
+            }
+            fclose(f_check);
 
             QuizResult qr;
             memset(&qr, 0, sizeof(QuizResult));
             strncpy(qr.name, student->name, sizeof(qr.name) - 1);
             strncpy(qr.roll, student->roll, sizeof(qr.roll) - 1);
 
-            printf("Enter subject of the exam [default: General]: ");
+            printf("Enter subject of the exam: ");
             char subject_buf[32];
             if (fgets(subject_buf, sizeof(subject_buf), stdin) != NULL)
             {
@@ -126,11 +134,7 @@ void handle_stud_menu(StudentLoginDta *student)
                     print_banner();
                     run_mcq_quiz(ques_ptr, &qr, q_count, &ques_head);
                     storeAndencrypt_progress_in_file(&qr);
-                    printf("\033[32m[✓] Progress recorded successfully to progress.dat!\033[0m\n");
-                }
-                else
-                {
-                    printf("\033[31mCould not start MCQ quiz: file '%s' not found or invalid\033[0m\n", encr_ques_filepath);
+                    printf("\033[32mProgress recorded successfully to progress.dat!\033[0m\n");
                 }
                 free(ques_ptr);
             }
@@ -149,11 +153,7 @@ void handle_stud_menu(StudentLoginDta *student)
                     print_banner();
                     run_tf_quiz(tf_ques_ptr, &qr, q_count, &ques_head);
                     storeAndencrypt_progress_in_file(&qr);
-                    printf("\033[32m[✓] Progress recorded successfully to progress.dat!\033[0m\n");
-                }
-                else
-                {
-                    printf("\033[31mCould not start True/False quiz: file '%s' not found or invalid\033[0m\n", encr_ques_filepath);
+                    printf("\033[32mProgress recorded successfully to progress.dat!\033[0m\n");
                 }
                 free(tf_ques_ptr);
             }
@@ -172,11 +172,7 @@ void handle_stud_menu(StudentLoginDta *student)
                     print_banner();
                     run_blank_quiz(blank_ques_ptr, &qr, q_count, &ques_head);
                     storeAndencrypt_progress_in_file(&qr);
-                    printf("\033[32m[✓] Progress recorded successfully to progress.dat!\033[0m\n");
-                }
-                else
-                {
-                    printf("\033[31mCould not start Fill-in-the-Blanks quiz: file '%s' not found or invalid\033[0m\n", encr_ques_filepath);
+                    printf("\033[32mProgress recorded successfully to progress.dat!\033[0m\n");
                 }
                 free(blank_ques_ptr);
             }

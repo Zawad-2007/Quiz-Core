@@ -68,6 +68,23 @@ void handle_teacher_menu(TeacherLoginDta *teacher)
             }
             rm_newl(og_ques_filepath, sizeof(og_ques_filepath));
             rm_extra_spaces(og_ques_filepath);
+            if (strlen(og_ques_filepath) == 0)
+            {
+                print_file_err();
+                printf("Press Enter to continue...");
+                getchar();
+                break;
+            }
+
+            FILE *f_check_og = fopen(og_ques_filepath, "r");
+            if (f_check_og == NULL)
+            {
+                print_file_err();
+                printf("Press Enter to continue...");
+                getchar();
+                break;
+            }
+            fclose(f_check_og);
 
             char encr_ques_filepath[64];
             printf("Enter filepath for output encrypted file: ");
@@ -77,6 +94,13 @@ void handle_teacher_menu(TeacherLoginDta *teacher)
             }
             rm_newl(encr_ques_filepath, sizeof(encr_ques_filepath));
             rm_extra_spaces(encr_ques_filepath);
+            if (strlen(encr_ques_filepath) == 0)
+            {
+                print_file_err();
+                printf("Press Enter to continue...");
+                getchar();
+                break;
+            }
 
             QuestionHeader ques_head;
             memset(&ques_head, 0, sizeof(QuestionHeader));
@@ -113,12 +137,12 @@ void handle_teacher_menu(TeacherLoginDta *teacher)
 
             if (result > 0)
             {
-                printf("\n\033[32m[✓] Successfully encrypted %d questions to '%s'!\033[0m\n",
+                printf("\n\033[32mSuccessfully encrypted %d questions to '%s'!\033[0m\n",
                        result, encr_ques_filepath);
             }
             else
             {
-                printf("\n\033[31m[✗] Failed to encrypt questions. Please check the file path and format.\033[0m\n");
+                printf("\n\033[31mFailed to encrypt questions. Please check the file path and format.\033[0m\n");
             }
 
             printf("Press Enter to continue...");
@@ -133,18 +157,20 @@ void handle_teacher_menu(TeacherLoginDta *teacher)
             printf("               STUDENT PROGRESS LOG               \n");
             printf("==================================================\n");
 
-            char progress_filepath[64] = "progress.dat";
-            char input_path[64];
-            printf("Enter filepath of progress file [default: progress.dat]: ");
-            if (fgets(input_path, sizeof(input_path), stdin) != NULL)
+            char progress_filepath[64] = {0};
+            printf("Enter filepath of progress file: ");
+            if (fgets(progress_filepath, sizeof(progress_filepath), stdin) == NULL)
             {
-                rm_newl(input_path, sizeof(input_path));
-                rm_extra_spaces(input_path);
-                if (strlen(input_path) > 0)
-                {
-                    strncpy(progress_filepath, input_path, sizeof(progress_filepath) - 1);
-                    progress_filepath[sizeof(progress_filepath) - 1] = '\0';
-                }
+                break;
+            }
+            rm_newl(progress_filepath, sizeof(progress_filepath));
+            rm_extra_spaces(progress_filepath);
+            if (strlen(progress_filepath) == 0)
+            {
+                print_file_err();
+                printf("Press Enter to return to Teacher Dashboard...");
+                getchar();
+                break;
             }
 
             show_all_progress_from_file(progress_filepath);
@@ -160,18 +186,20 @@ void handle_teacher_menu(TeacherLoginDta *teacher)
             printf("             DECRYPT & EXPORT PROGRESS            \n");
             printf("==================================================\n");
 
-            char encr_progress_filepath[64] = "progress.dat";
-            char input_path[64];
-            printf("Enter filepath of encrypted progress file [default: progress.dat]: ");
-            if (fgets(input_path, sizeof(input_path), stdin) != NULL)
+            char encr_progress_filepath[64] = {0};
+            printf("Enter filepath of encrypted progress file: ");
+            if (fgets(encr_progress_filepath, sizeof(encr_progress_filepath), stdin) == NULL)
             {
-                rm_newl(input_path, sizeof(input_path));
-                rm_extra_spaces(input_path);
-                if (strlen(input_path) > 0)
-                {
-                    strncpy(encr_progress_filepath, input_path, sizeof(encr_progress_filepath) - 1);
-                    encr_progress_filepath[sizeof(encr_progress_filepath) - 1] = '\0';
-                }
+                break;
+            }
+            rm_newl(encr_progress_filepath, sizeof(encr_progress_filepath));
+            rm_extra_spaces(encr_progress_filepath);
+            if (strlen(encr_progress_filepath) == 0)
+            {
+                print_file_err();
+                printf("Press Enter to return to Teacher Dashboard...");
+                getchar();
+                break;
             }
 
             decrypt_and_save_progress(encr_progress_filepath);

@@ -5,7 +5,7 @@ void storeAndencrypt_progress_in_file(QuizResult *progress)
     FILE *progress_file = fopen("progress.dat", "ab");
     if (progress_file == NULL)
     {
-        printf("\033[31mFile Error: Cannot open progress.dat\033[0m\n");
+        print_file_err();
         return;
     }
 
@@ -67,7 +67,7 @@ void decryptAndload_progress_in_mem()
     FILE *encr_progress_file = fopen("progress.dat", "rb");
     if (encr_progress_file == NULL)
     {
-        printf("\033[31mFile Error: No progress.dat file found\033[0m\n");
+        print_file_err();
         return;
     }
 
@@ -161,7 +161,7 @@ void show_all_progress_from_file(char *encr_progress_filepath)
     FILE *progress = fopen(encr_progress_filepath, "rb");
     if (progress == NULL)
     {
-        printf("\033[31mFile Error: Cannot open '%s'\033[0m\n", encr_progress_filepath);
+        print_file_err();
         return;
     }
 
@@ -209,7 +209,7 @@ void show_student_progress_from_file(char *encr_progress_filepath, char *student
     FILE *progress = fopen(encr_progress_filepath, "rb");
     if (progress == NULL)
     {
-        printf("\033[33mNo progress record file found ('%s'). Take a quiz first!\033[0m\n", encr_progress_filepath);
+        print_file_err();
         return;
     }
 
@@ -268,7 +268,7 @@ int decrypt_and_save_progress(char *encr_progress_filepath)
     FILE *encr_progress = fopen(encr_progress_filepath, "rb");
     if (encr_progress == NULL)
     {
-        printf("\033[31mFile Error: Cannot open '%s'\033[0m\n", encr_progress_filepath);
+        print_file_err();
         return 1;
     }
 
@@ -281,7 +281,7 @@ int decrypt_and_save_progress(char *encr_progress_filepath)
     FILE *decr_progress = fopen(decr_progress_filepath, "w");
     if (decr_progress == NULL)
     {
-        printf("\033[31mFile Error: Cannot create '%s'\033[0m\n", decr_progress_filepath);
+        print_file_err();
         fclose(encr_progress);
         return 1;
     }

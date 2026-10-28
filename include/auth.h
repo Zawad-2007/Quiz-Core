@@ -7,6 +7,8 @@
 #include "ui.h"
 #include "misc.h"
 
+#define ADMIN_PASSWORD "admin"
+
 int student_login(StudentLoginDta *student_out);
 
 int teacher_login(TeacherLoginDta *teacher_out);

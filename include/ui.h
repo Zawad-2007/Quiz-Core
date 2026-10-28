@@ -3,7 +3,9 @@
 
 #include<stdio.h>
 
-#define ERR_STR "\033[31mFILE error\n"
+#ifndef ERR_STR
+#define ERR_STR "\033[31mFILE error\033[0m\n"
+#endif
 
 void clear_terminal();
 

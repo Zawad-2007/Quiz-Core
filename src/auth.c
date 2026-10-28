@@ -2,27 +2,32 @@
 
 int student_login(StudentLoginDta *student_out)
 {
-    char filepath[64] = "CSE-2025-B-B1.dat";
-    char input_filepath[64];
+    char filepath[64] = {0};
 
-    printf("Enter class code or student database file [default: CSE-2025-B-B1.dat]: ");
-    if (fgets(input_filepath, sizeof(input_filepath), stdin) != NULL)
+    printf("Enter student database file or class code: ");
+    if (fgets(filepath, sizeof(filepath), stdin) == NULL)
     {
-        rm_newl(input_filepath, sizeof(input_filepath));
-        rm_extra_spaces(input_filepath);
-        if (strlen(input_filepath) > 0)
-        {
-            if (strstr(input_filepath, ".dat") == NULL)
-            {
-                snprintf(filepath, sizeof(filepath), "%s.dat", input_filepath);
-            }
-            else
-            {
-                strncpy(filepath, input_filepath, sizeof(filepath) - 1);
-                filepath[sizeof(filepath) - 1] = '\0';
-            }
-        }
+        return 0;
     }
+    rm_newl(filepath, sizeof(filepath));
+    rm_extra_spaces(filepath);
+    if (strlen(filepath) == 0)
+    {
+        print_file_err();
+        return 0;
+    }
+    if (strstr(filepath, ".dat") == NULL)
+    {
+        strcat(filepath, ".dat");
+    }
+
+    FILE *f_check = fopen(filepath, "rb");
+    if (f_check == NULL)
+    {
+        print_file_err();
+        return 0;
+    }
+    fclose(f_check);
 
     ClassData cd;
     int buf_size = 10;
@@ -36,7 +41,6 @@ int student_login(StudentLoginDta *student_out)
     int n = decryptAndloadInmem_StudentLoginData(filepath, &cd, &ld_ptr, buf_size);
     if (n <= 0)
     {
-        printf("\033[31mCould not load student database from '%s'\033[0m\n", filepath);
         free(ld_ptr);
         return 0;
     }
@@ -67,41 +71,53 @@ int student_login(StudentLoginDta *student_out)
         if (strcmp(ld_ptr[i].roll, input_roll) == 0 && strcmp(ld_ptr[i].password, input_pass) == 0)
         {
             memcpy(student_out, &ld_ptr[i], sizeof(StudentLoginDta));
-            printf("\n\033[32m[✓] Login Successful! Welcome, %s (Roll: %s)\033[0m\n",
+            printf("\n\033[32mLogin Successful! Welcome, %s (Roll: %s)\033[0m\n",
                    student_out->name, student_out->roll);
             free(ld_ptr);
             return 1;
         }
     }
 
-    printf("\n\033[31m[✗] Authentication failed: Incorrect Roll or Password\033[0m\n");
+    printf("\n\033[31mAuthentication failed: Incorrect Roll or Password\033[0m\n");
     free(ld_ptr);
     return 0;
 }
 
 int teacher_login(TeacherLoginDta *teacher_out)
 {
-    char filepath[64] = "CSE_teachers.dat";
-    char input_dept[64];
+    char input_dept[64] = {0};
 
-    printf("Enter Department code or teacher file [default: CSE_teachers.dat]: ");
-    if (fgets(input_dept, sizeof(input_dept), stdin) != NULL)
+    printf("Enter teacher database file or department code: ");
+    if (fgets(input_dept, sizeof(input_dept), stdin) == NULL)
     {
-        rm_newl(input_dept, sizeof(input_dept));
-        rm_extra_spaces(input_dept);
-        if (strlen(input_dept) > 0)
-        {
-            if (strstr(input_dept, ".dat") != NULL)
-            {
-                strncpy(filepath, input_dept, sizeof(filepath) - 1);
-                filepath[sizeof(filepath) - 1] = '\0';
-            }
-            else
-            {
-                snprintf(filepath, sizeof(filepath), "%s_teachers.dat", input_dept);
-            }
-        }
+        return 0;
     }
+    rm_newl(input_dept, sizeof(input_dept));
+    rm_extra_spaces(input_dept);
+    if (strlen(input_dept) == 0)
+    {
+        print_file_err();
+        return 0;
+    }
+
+    char filepath[64];
+    if (strstr(input_dept, ".dat") != NULL)
+    {
+        strncpy(filepath, input_dept, sizeof(filepath) - 1);
+        filepath[sizeof(filepath) - 1] = '\0';
+    }
+    else
+    {
+        snprintf(filepath, sizeof(filepath), "%s_teachers.dat", input_dept);
+    }
+
+    FILE *f_check = fopen(filepath, "rb");
+    if (f_check == NULL)
+    {
+        print_file_err();
+        return 0;
+    }
+    fclose(f_check);
 
     int buf_size = 10;
     TeacherLoginDta *ld_ptr = (TeacherLoginDta *)malloc(buf_size * sizeof(TeacherLoginDta));
@@ -114,7 +130,6 @@ int teacher_login(TeacherLoginDta *teacher_out)
     int n = decryptAndloadInmem_TeacherLoginData(filepath, &ld_ptr, buf_size);
     if (n <= 0)
     {
-        printf("\033[31mCould not load teacher database from '%s'\033[0m\n", filepath);
         free(ld_ptr);
         return 0;
     }
@@ -145,14 +160,14 @@ int teacher_login(TeacherLoginDta *teacher_out)
         if (strcasecmp(ld_ptr[i].name, input_name) == 0 && strcmp(ld_ptr[i].password, input_pass) == 0)
         {
             memcpy(teacher_out, &ld_ptr[i], sizeof(TeacherLoginDta));
-            printf("\n\033[32m[✓] Login Successful! Welcome, %s (%s, Dept: %s)\033[0m\n",
+            printf("\n\033[32mLogin Successful! Welcome, %s (%s, Dept: %s)\033[0m\n",
                    teacher_out->name, teacher_out->designation_code, teacher_out->dept_code);
             free(ld_ptr);
             return 1;
         }
     }
 
-    printf("\n\033[31m[✗] Authentication failed: Incorrect Name or Password\033[0m\n");
+    printf("\n\033[31mAuthentication failed: Incorrect Name or Password\033[0m\n");
     free(ld_ptr);
     return 0;
 }
@@ -160,7 +175,7 @@ int teacher_login(TeacherLoginDta *teacher_out)
 int admin_login(void)
 {
     char password[32];
-    printf("Enter Admin Password [default: admin]: ");
+    printf("Enter Admin Password: ");
     if (fgets(password, sizeof(password), stdin) == NULL)
     {
         return 0;
@@ -168,13 +183,13 @@ int admin_login(void)
     rm_newl(password, sizeof(password));
     rm_extra_spaces(password);
 
-    if (strcmp(password, "admin") == 0 || strcmp(password, "admin123") == 0)
+    if (strcmp(password, ADMIN_PASSWORD) == 0)
     {
-        printf("\n\033[32m[✓] Admin Login Successful!\033[0m\n");
+        printf("\n\033[32mAdmin Login Successful!\033[0m\n");
         return 1;
     }
 
-    printf("\n\033[31m[✗] Incorrect Admin Password!\033[0m\n");
+    printf("\n\033[31mIncorrect Admin Password!\033[0m\n");
     return 0;
 }
 
@@ -209,7 +224,7 @@ void handle_admin_menu(void)
         case 1:
         {
             char path[64];
-            printf("Enter filepath of student login text file (e.g. stud_data.txt): ");
+            printf("Enter filepath of student login text file: ");
             if (fgets(path, sizeof(path), stdin) != NULL)
             {
                 rm_newl(path, sizeof(path));
@@ -227,7 +242,7 @@ void handle_admin_menu(void)
         case 2:
         {
             char path[64];
-            printf("Enter filepath of encrypted student data (e.g. CSE-2025-B-B1.dat): ");
+            printf("Enter filepath of encrypted student data: ");
             if (fgets(path, sizeof(path), stdin) != NULL)
             {
                 rm_newl(path, sizeof(path));
@@ -245,7 +260,7 @@ void handle_admin_menu(void)
         case 3:
         {
             char path[64];
-            printf("Enter filepath of encrypted student data to append (e.g. CSE-2025-B-B1.dat): ");
+            printf("Enter filepath of encrypted student data to append: ");
             if (fgets(path, sizeof(path), stdin) != NULL)
             {
                 rm_newl(path, sizeof(path));
@@ -259,7 +274,7 @@ void handle_admin_menu(void)
         case 4:
         {
             char path[64];
-            printf("Enter filepath of teacher login text file (e.g. teacher_login.txt): ");
+            printf("Enter filepath of teacher login text file: ");
             if (fgets(path, sizeof(path), stdin) != NULL)
             {
                 rm_newl(path, sizeof(path));
@@ -277,7 +292,7 @@ void handle_admin_menu(void)
         case 5:
         {
             char path[64];
-            printf("Enter filepath of encrypted teacher data (e.g. CSE_teachers.dat): ");
+            printf("Enter filepath of encrypted teacher data: ");
             if (fgets(path, sizeof(path), stdin) != NULL)
             {
                 rm_newl(path, sizeof(path));
@@ -295,7 +310,7 @@ void handle_admin_menu(void)
         case 6:
         {
             char path[64];
-            printf("Enter filepath of encrypted teacher data to append (e.g. CSE_teachers.dat): ");
+            printf("Enter filepath of encrypted teacher data to append: ");
             if (fgets(path, sizeof(path), stdin) != NULL)
             {
                 rm_newl(path, sizeof(path));
@@ -315,4 +330,3 @@ void handle_admin_menu(void)
         }
     }
 }
-

@@ -5,7 +5,7 @@ int encrypt_TeacherLoginData(char *og_login_data_filepath)
     FILE *og_login_data = fopen(og_login_data_filepath, "rb");
     if (og_login_data == NULL)
     {
-        printf("\033[31mFile Error\033[0m\n");
+        print_file_err();
         return -1;
     }
     char *unnecessary_line = malloc(256 * sizeof(char)); // "Name    Dept. Code Designation Code ..."
@@ -55,7 +55,7 @@ int encrypt_TeacherLoginData(char *og_login_data_filepath)
     FILE *encr_login_data = fopen(encr_login_data_filepath, "wb");
     if (encr_login_data == NULL)
     {
-        printf("\033[31mFile Error\033[0m\n");
+        print_file_err();
         fclose(og_login_data);
         return -3;
     }
@@ -122,7 +122,7 @@ int decryptAndloadInmem_TeacherLoginData(char *encr_login_data_filepath, Teacher
     FILE *encr_login_data = fopen(encr_login_data_filepath, "rb");
     if (encr_login_data == NULL)
     {
-        printf("\033[31mFile Error: Cannot open '%s'\033[0m\n", encr_login_data_filepath);
+        print_file_err();
         return -1;
     }
 
@@ -158,7 +158,7 @@ int decryptAndsave_TeacherLoginData(char *encr_login_data_filepath)
     FILE *encr_login_data = fopen(encr_login_data_filepath, "rb");
     if (encr_login_data == NULL)
     {
-        printf("\033[31mFile Error: Cannot open '%s'\033[0m\n", encr_login_data_filepath);
+        print_file_err();
         return -1;
     }
 
@@ -176,7 +176,7 @@ int decryptAndsave_TeacherLoginData(char *encr_login_data_filepath)
     FILE *decr_login_data = fopen(decr_login_data_filepath, "wb");
     if (decr_login_data == NULL)
     {
-        printf("\033[31mFile Error: Cannot create '%s'\033[0m\n", decr_login_data_filepath);
+        print_file_err();
         fclose(encr_login_data);
         return -1;
     }
@@ -207,7 +207,7 @@ int append_encrypted_TeacherLoginData(char *encr_login_data_filepath)
     FILE *file_exists = fopen(encr_login_data_filepath, "rb");
     if (!(file_exists))
     {
-        printf("\033[31mFile does not exist\033[0m\n");
+        print_file_err();
         return -1;
     }
     fclose(file_exists);

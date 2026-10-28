@@ -45,6 +45,12 @@ typedef struct
     char seconds_per_ques[4];
 } QuestionHeader;
 
+#ifndef ERR_STR
+#define ERR_STR "\033[31mFILE error\033[0m\n"
+#endif
+
+void print_file_err(void);
+
 void rm_newl(char *string, int lenght);
 
 void rm_extra_spaces(char *str);

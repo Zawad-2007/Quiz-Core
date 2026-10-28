@@ -20,14 +20,14 @@ int encrypt_mcq_question(char original_filepath[], char encrypted_filepath[], Qu
     FILE *unencrypted_ques = fopen(original_filepath, "rb");
     if (unencrypted_ques == NULL)
     {
-        printf("\033[31mFILE error: Cannot open original question file\033[0m\n");
+        print_file_err();
         return -1;
     }
 
     FILE *encrypted_ques = fopen(encrypted_filepath, "wb");
     if (encrypted_ques == NULL)
     {
-        printf("\033[31mFILE error: Cannot create encrypted question file\033[0m\n");
+        print_file_err();
         fclose(unencrypted_ques);
         return -1;
     }
@@ -80,7 +80,7 @@ int decryptAndload_mcq_question(char encrypted_filepath[], Question *q, Question
     FILE *encrypted_ques = fopen(encrypted_filepath, "rb");
     if(encrypted_ques==NULL)
     {
-        printf("\033[31mFile Error\033[0m\n");
+        print_file_err();
         return -1;
     }
 

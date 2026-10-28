@@ -12,14 +12,14 @@ int encrypt_blank_question(char original_filepath[], char encrypted_filepath[], 
     FILE *unencrypted_ques = fopen(original_filepath, "r");
     if (unencrypted_ques == NULL)
     {
-        printf("\033[31mFile error: Cannot open original question file\033[0m\n");
+        print_file_err();
         return -1;
     }
 
     FILE *encrypted_ques = fopen(encrypted_filepath, "wb");
     if (encrypted_ques == NULL)
     {
-        printf("\033[31mFile error: Cannot create encrypted question file\033[0m\n");
+        print_file_err();
         fclose(unencrypted_ques);
         return -1;
     }
@@ -86,7 +86,7 @@ int decryptAndload_blank_question(char encrypted_filepath[], BlankQuestion *q, Q
     FILE *encrypted_ques = fopen(encrypted_filepath, "rb");
     if (encrypted_ques == NULL)
     {
-        printf("\033[31mFile Error: Cannot open encrypted quiz file '%s'\033[0m\n", encrypted_filepath);
+        print_file_err();
         return -1;
     }
 
