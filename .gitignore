@@ -7,3 +7,4 @@ quiz-core
 *.bin
 *.txt
 *.dat
+!Questions/*

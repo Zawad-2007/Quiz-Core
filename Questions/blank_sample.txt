@@ -1,0 +1,20 @@
+The data structure that operates on a Last-In-First-Out (LIFO) basis is called a _______.
+stack
+The process of converting ciphertext back into plaintext is called _______.
+decryption
+In computer science, CPU stands for Central _______ Unit.
+Processing
+An undirected graph with no cycles is called an _______ graph.
+acyclic
+The search algorithm that explores nearest neighbors first is called _______ First Search.
+Breadth
+In C, the function used to allocate dynamic memory is _______.
+malloc
+The number of bits in one standard byte is _______.
+8
+A function that calls itself directly or indirectly is known as a _______ function.
+recursive
+The time complexity of accessing an element in an array by its index is O(_______).
+1
+In relational databases, SQL stands for Structured _______ Language.
+Query

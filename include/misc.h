@@ -5,10 +5,11 @@
 #include "affine_cipher.h"
 
 #include <stdio.h>
-#include<stdlib.h>
+#include <stdlib.h>
 #include <string.h>
-#include<time.h>
-#include<ctype.h>
+#include <strings.h>
+#include <time.h>
+#include <ctype.h>
 
 typedef struct
 {

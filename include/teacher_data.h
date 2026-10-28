@@ -1,12 +1,12 @@
 #ifndef TEACHER_DATA_H
 #define TEACHER_DATA_H
 
-#include<stdio.h>
-#include<string.h>
-#include<stdlib.h>
-#include<ctype.h>
-#include"affine_cipher.h"
-#include"misc.h"
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <ctype.h>
+#include "affine_cipher.h"
+#include "misc.h"
 
 typedef struct
 {
@@ -19,7 +19,7 @@ typedef struct
 
 int encrypt_TeacherLoginData(char *og_login_data_filepath);
 
-int decryptAndloadInmem_TeacherLoginData(char *encr_login_data_filepath, TeacherLoginDta **ld_ptr_aadr, int ld_buf_size);
+int decryptAndloadInmem_TeacherLoginData(char *encr_login_data_filepath, TeacherLoginDta **ld_ptr_addr, int ld_buf_size);
 
 int decryptAndsave_TeacherLoginData(char *encr_login_data_filepath);
 

@@ -67,7 +67,6 @@ int encrypt_StudentLoginData(char *og_login_data_filepath)
     char line_buf[128];
     while(fgets(line_buf,sizeof(line_buf),og_login_data)!=0)
     {
-        int tok_count = 0;
         char *token;
 
         token = strtok(line_buf, ",");
@@ -197,9 +196,8 @@ int decryptAndsave_StudentLoginData(char *encr_login_data_filepath)
 
 int append_encrypted_StudentLoginData(char *encr_login_data_filepath)
 {
-    ClassData cd;
     FILE *file_exists = fopen(encr_login_data_filepath, "rb");
-    if(!(file_exists))
+    if (!(file_exists))
     {
         printf("\033[31mFile does not exist\033[0m\n");
         return -1;
@@ -226,6 +224,7 @@ int append_encrypted_StudentLoginData(char *encr_login_data_filepath)
         {
             printf("\033[31mFile does not contain ClassData header\033[0m\n");
             printf("\033[32mEncrypt the original file properly\033[0m\n");
+            fclose(file_exists);
             return -2;
         }
 
@@ -233,7 +232,7 @@ int append_encrypted_StudentLoginData(char *encr_login_data_filepath)
         while (1)
         {
             FILE *encr_login_data = fopen(encr_login_data_filepath, "ab");
-            if(encr_login_data==NULL)
+            if (encr_login_data == NULL)
             {
                 printf("\033[31mFile Error\033[0m\n");
                 return -3;
@@ -257,29 +256,29 @@ int append_encrypted_StudentLoginData(char *encr_login_data_filepath)
             if (fwrite(&ld, sizeof(StudentLoginDta), 1, encr_login_data) == 0)
             {
                 printf("\033[31mCannot append\033[0m\n");
+                fclose(encr_login_data);
                 return -3;
             }
+            fclose(encr_login_data);
 
-            printf("Want to add another data of a student?(y/n)");
-            scanf("%c", &c);
+            printf("Want to add another data of a student?(y/n): ");
+            if (scanf("%c", &c) != 1) break;
             getchar();
 
             if (tolower(c) == 'y')
             {
                 continue;
             }
-            else if(tolower(c)=='n')
+            else if (tolower(c) == 'n')
             {
                 break;
             }
             else
             {
                 printf("Wrong option.\n");
-                continue;
+                break;
             }
-            fclose(encr_login_data);
         }
-        
     }
     return 0;
 }

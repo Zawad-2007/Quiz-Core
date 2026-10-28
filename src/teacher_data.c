@@ -1,4 +1,4 @@
-#include"../include/teacher_data.h"
+#include "../include/teacher_data.h"
 
 int encrypt_TeacherLoginData(char *og_login_data_filepath)
 {
@@ -9,34 +9,55 @@ int encrypt_TeacherLoginData(char *og_login_data_filepath)
         return -1;
     }
     char *unnecessary_line = malloc(256 * sizeof(char)); // "Name    Dept. Code Designation Code ..."
-    fgets(unnecessary_line, 256, og_login_data);
-    free(unnecessary_line);
+    if (unnecessary_line != NULL)
+    {
+        if (fgets(unnecessary_line, 256, og_login_data) == NULL)
+        {
+            free(unnecessary_line);
+            fclose(og_login_data);
+            return -1;
+        }
+        free(unnecessary_line);
+    }
 
     printf("Enter the Department Code : ");
     char dept_code[16];
-    scanf("%s", dept_code);
+    if (scanf("%15s", dept_code) != 1)
+    {
+        fclose(og_login_data);
+        return -1;
+    }
     getchar();
 
     char encr_login_data_filepath[64];
-    snprintf(encr_login_data_filepath,64, "%s_teachers.dat", dept_code);
+    snprintf(encr_login_data_filepath, sizeof(encr_login_data_filepath), "%s_teachers.dat", dept_code);
 
-    FILE *encr_login_data = fopen(encr_login_data_filepath, "wb");
     FILE *file_already_exists = fopen(encr_login_data_filepath, "rb");
     if (file_already_exists)
     {
         printf("File already exists.\nWant to overwrite?(y/n)\n");
         char c;
-        scanf("%c", &c);
-        getchar();
-        if (tolower(c) == 'n')
+        if (scanf("%c", &c) != 1)
         {
             fclose(file_already_exists);
+            fclose(og_login_data);
             return -4;
         }
-        else
+        getchar();
+        fclose(file_already_exists);
+        if (tolower((unsigned char)c) == 'n')
         {
-            fclose(file_already_exists);
+            fclose(og_login_data);
+            return -4;
         }
+    }
+
+    FILE *encr_login_data = fopen(encr_login_data_filepath, "wb");
+    if (encr_login_data == NULL)
+    {
+        printf("\033[31mFile Error\033[0m\n");
+        fclose(og_login_data);
+        return -3;
     }
 
     printf("%s created\n", encr_login_data_filepath);
@@ -45,32 +66,32 @@ int encrypt_TeacherLoginData(char *og_login_data_filepath)
     int rec_count = 0;
 
     char line_buf[128];
-    while (fgets(line_buf, sizeof(line_buf), og_login_data) != 0)
+    while (fgets(line_buf, sizeof(line_buf), og_login_data) != NULL)
     {
         char *ptr[] = {ld.name, ld.dept_code, ld.designation_code, ld.joining_date, ld.password};
 
         int i = 0; 
-        char *token = strtok(line_buf, ",");//get the first token
+        char *token = strtok(line_buf, ",");
 
-        
         while (token != NULL && i < 5)
-        {//loop conditions : valid token && array index check
-            strcpy(ptr[i], token);
+        {
+            strncpy(ptr[i], token, 31);
+            ptr[i][31] = '\0';
 
-            token = strtok(NULL, ","); //grabbing the next token at the end of iteration
-            i++;//increments i for getting the next element in ptr[] array
+            token = strtok(NULL, ",");
+            i++;
             if (token != NULL && i >= 5)
-            {//When strtok returns a valid pointer but the index has passed 4
-                printf("More element in the teacher login data of index %d\n", rec_count + 1);
-                printf("Skipping the extra element(s)\n");
+            {
+                printf("More elements in teacher login data record %d (skipping extra)\n", rec_count + 1);
                 break;
             }
         }
 
-        
         if (i < 4)
         {
-            printf("Less element in the teacher login data of index %d\n", rec_count + 1);
+            printf("Fewer elements than expected in teacher login data record %d\n", rec_count + 1);
+            fclose(og_login_data);
+            fclose(encr_login_data);
             return -5;
         }
 
@@ -79,7 +100,7 @@ int encrypt_TeacherLoginData(char *og_login_data_filepath)
         rm_extra_spaces(ld.designation_code);
         rm_extra_spaces(ld.joining_date);
         rm_extra_spaces(ld.password);
-        rm_newl(ld.password, 16);
+        rm_newl(ld.password, sizeof(ld.password));
 
         encrypt_affine((unsigned char *)ld.name, sizeof(ld.name), 5, 2);
         encrypt_affine((unsigned char *)ld.dept_code, sizeof(ld.dept_code), 5, 2);
@@ -89,6 +110,9 @@ int encrypt_TeacherLoginData(char *og_login_data_filepath)
         fwrite(&ld, sizeof(TeacherLoginDta), 1, encr_login_data);
         rec_count++;
     }
+
+    fclose(og_login_data);
+    fclose(encr_login_data);
     return rec_count;
 }
 
@@ -98,68 +122,68 @@ int decryptAndloadInmem_TeacherLoginData(char *encr_login_data_filepath, Teacher
     FILE *encr_login_data = fopen(encr_login_data_filepath, "rb");
     if (encr_login_data == NULL)
     {
-        printf("\033[31mFile Error\033[0m\n");
+        printf("\033[31mFile Error: Cannot open '%s'\033[0m\n", encr_login_data_filepath);
         return -1;
     }
-    else
-    {
-        int i = 0;
-        while (fread(ld_ptr + i, sizeof(TeacherLoginDta), 1, encr_login_data) != 0)
-        {
-            decrypt_affine((unsigned char *)ld_ptr[i].name, 32, 5, 2);
-            decrypt_affine((unsigned char *)ld_ptr[i].dept_code, 8, 5, 2);
-            decrypt_affine((unsigned char *)ld_ptr[i].designation_code, 16, 5, 2);
-            decrypt_affine((unsigned char *)ld_ptr[i].joining_date, 32, 5, 2);
-            decrypt_affine((unsigned char *)ld_ptr[i].password, 16, 5, 2);
 
-            i++;
-            if (i >= ld_buf_size)
+    int i = 0;
+    while (fread(ld_ptr + i, sizeof(TeacherLoginDta), 1, encr_login_data) != 0)
+    {
+        decrypt_affine((unsigned char *)ld_ptr[i].name, 32, 5, 2);
+        decrypt_affine((unsigned char *)ld_ptr[i].dept_code, 8, 5, 2);
+        decrypt_affine((unsigned char *)ld_ptr[i].designation_code, 16, 5, 2);
+        decrypt_affine((unsigned char *)ld_ptr[i].joining_date, 32, 5, 2);
+        decrypt_affine((unsigned char *)ld_ptr[i].password, 16, 5, 2);
+
+        i++;
+        if (i >= ld_buf_size)
+        {
+            ld_buf_size = i + 5;
+            TeacherLoginDta *temp = (TeacherLoginDta *)realloc(ld_ptr, ld_buf_size * sizeof(TeacherLoginDta));
+            if (temp == NULL)
             {
-                TeacherLoginDta *temp =(TeacherLoginDta *) realloc(ld_ptr, (i + 1) * sizeof(TeacherLoginDta));
-                if (temp == NULL)
-                {
-                    fclose(encr_login_data);
-                    return -1;
-                }
-                else
-                {
-                    ld_ptr = temp;
-                    *ld_ptr_addr = temp;
-                }
+                fclose(encr_login_data);
+                return -1;
             }
+            ld_ptr = temp;
+            *ld_ptr_addr = temp;
         }
-        return i;
     }
+    fclose(encr_login_data);
+    return i;
 }
 
 int decryptAndsave_TeacherLoginData(char *encr_login_data_filepath)
 {
     FILE *encr_login_data = fopen(encr_login_data_filepath, "rb");
-
     if (encr_login_data == NULL)
     {
-        printf("\033[31mFile Error\033[0m\n");
+        printf("\033[31mFile Error: Cannot open '%s'\033[0m\n", encr_login_data_filepath);
         return -1;
     }
 
     printf("Enter Department Code : ");
     char dept_code[8];
-    scanf("%s", dept_code);
+    if (scanf("%7s", dept_code) != 1)
+    {
+        fclose(encr_login_data);
+        return -1;
+    }
     getchar();
 
     char decr_login_data_filepath[64];
-    snprintf(decr_login_data_filepath, 64, "%s_teachers.txt", dept_code);
+    snprintf(decr_login_data_filepath, sizeof(decr_login_data_filepath), "%s_teachers.txt", dept_code);
     FILE *decr_login_data = fopen(decr_login_data_filepath, "wb");
     if (decr_login_data == NULL)
     {
-        printf("\033[31mFile Error\033[0m\n");
+        printf("\033[31mFile Error: Cannot create '%s'\033[0m\n", decr_login_data_filepath);
+        fclose(encr_login_data);
         return -1;
     }
 
     fprintf(decr_login_data, "%-32s%-16s%-20s%-32s%s\n", "Name", "Dept Code", "Designation Code", "Joining Date", "Password");
 
     TeacherLoginDta ld;
-
     int rec_count = 0;
     while (fread(&ld, sizeof(TeacherLoginDta), 1, encr_login_data) != 0)
     {
@@ -172,6 +196,9 @@ int decryptAndsave_TeacherLoginData(char *encr_login_data_filepath)
         fprintf(decr_login_data, "%-32s%-16s%-20s%-32s%s\n", ld.name, ld.dept_code, ld.designation_code, ld.joining_date, ld.password);
         rec_count++;
     }
+
+    fclose(encr_login_data);
+    fclose(decr_login_data);
     return rec_count;
 }
 
@@ -183,59 +210,66 @@ int append_encrypted_TeacherLoginData(char *encr_login_data_filepath)
         printf("\033[31mFile does not exist\033[0m\n");
         return -1;
     }
-    else
+    fclose(file_exists);
+
+    char c = 'y';
+    while (1)
     {
-        char c = 'y';
-        while (1)
+        FILE *encr_login_data = fopen(encr_login_data_filepath, "ab");
+        if (encr_login_data == NULL)
         {
-            FILE *encr_login_data = fopen(encr_login_data_filepath, "ab");
-            TeacherLoginDta ld;
-            printf("Name              : ");
-            fgets(ld.name, sizeof(ld.name), stdin);
-            printf("Dept. Code        : ");
-            fgets(ld.dept_code, sizeof(ld.dept_code), stdin);
-            printf("Designation Code  : ");
-            fgets(ld.designation_code, sizeof(ld.designation_code), stdin);
-            printf("Joining Date      : ");
-            fgets(ld.joining_date, sizeof(ld.joining_date), stdin);
-            printf("Password : ");
-            fgets(ld.password, sizeof(ld.password), stdin);
+            printf("\033[31mCannot open file for appending\033[0m\n");
+            return -3;
+        }
 
-            rm_newl(ld.name, sizeof(ld.name));
-            rm_newl(ld.dept_code, sizeof(ld.dept_code));
-            rm_newl(ld.designation_code, sizeof(ld.designation_code));
-            rm_newl(ld.joining_date, sizeof(ld.joining_date));
-            rm_newl(ld.password, sizeof(ld.password));
+        TeacherLoginDta ld;
+        printf("Name              : ");
+        if (fgets(ld.name, sizeof(ld.name), stdin) == NULL) { fclose(encr_login_data); break; }
+        printf("Dept. Code        : ");
+        if (fgets(ld.dept_code, sizeof(ld.dept_code), stdin) == NULL) { fclose(encr_login_data); break; }
+        printf("Designation Code  : ");
+        if (fgets(ld.designation_code, sizeof(ld.designation_code), stdin) == NULL) { fclose(encr_login_data); break; }
+        printf("Joining Date      : ");
+        if (fgets(ld.joining_date, sizeof(ld.joining_date), stdin) == NULL) { fclose(encr_login_data); break; }
+        printf("Password          : ");
+        if (fgets(ld.password, sizeof(ld.password), stdin) == NULL) { fclose(encr_login_data); break; }
 
-            encrypt_affine((unsigned char *)ld.name, sizeof(ld.name), 5, 2);
-            encrypt_affine((unsigned char *)ld.dept_code, sizeof(ld.dept_code), 5, 2);
-            encrypt_affine((unsigned char *)ld.designation_code, sizeof(ld.designation_code), 5, 2);
-            encrypt_affine((unsigned char *)ld.joining_date, sizeof(ld.joining_date), 5, 2);
-            encrypt_affine((unsigned char *)ld.password, sizeof(ld.password), 5, 2);
+        rm_newl(ld.name, sizeof(ld.name));
+        rm_newl(ld.dept_code, sizeof(ld.dept_code));
+        rm_newl(ld.designation_code, sizeof(ld.designation_code));
+        rm_newl(ld.joining_date, sizeof(ld.joining_date));
+        rm_newl(ld.password, sizeof(ld.password));
 
-            if (fwrite(&ld, sizeof(TeacherLoginDta), 1, encr_login_data) == 0)
-            {
-                printf("\033[31mCannot append\033[0m\n");
-                return -3;
-            }
+        encrypt_affine((unsigned char *)ld.name, sizeof(ld.name), 5, 2);
+        encrypt_affine((unsigned char *)ld.dept_code, sizeof(ld.dept_code), 5, 2);
+        encrypt_affine((unsigned char *)ld.designation_code, sizeof(ld.designation_code), 5, 2);
+        encrypt_affine((unsigned char *)ld.joining_date, sizeof(ld.joining_date), 5, 2);
+        encrypt_affine((unsigned char *)ld.password, sizeof(ld.password), 5, 2);
 
-            printf("Want to add another data of a student?(y/n)");
-            scanf("%c", &c);
-            getchar();
+        if (fwrite(&ld, sizeof(TeacherLoginDta), 1, encr_login_data) == 0)
+        {
+            printf("\033[31mCannot append\033[0m\n");
+            fclose(encr_login_data);
+            return -3;
+        }
+        fclose(encr_login_data);
 
-            if (tolower(c) == 'y')
-            {
-                continue;
-            }
-            else if (tolower(c) == 'n')
-            {
-                break;
-            }
-            else
-            {
-                printf("Wrong option.\n");
-                continue;
-            }
+        printf("Want to add another teacher?(y/n): ");
+        if (scanf("%c", &c) != 1) break;
+        getchar();
+
+        if (tolower((unsigned char)c) == 'y')
+        {
+            continue;
+        }
+        else if (tolower((unsigned char)c) == 'n')
+        {
+            break;
+        }
+        else
+        {
+            printf("Invalid option. Stopping.\n");
+            break;
         }
     }
     return 0;

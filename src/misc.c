@@ -35,7 +35,6 @@ void rm_extra_spaces(char *str)
         } 
     }
 
-    char temp;
     for (int i = 0; i < n-space_count; i++)
     {
         str[i] = str[i + space_count];

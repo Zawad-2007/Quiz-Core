@@ -1,46 +1,107 @@
 # Quiz-Core
 
-**A CLI quizing application for both students and teachers**
+**A CLI quizzing application for both students and teachers**
 
-#The program is at a very alpha stage of it's life. Only the MCQ engine part is done. Other question types ike fill in the blanks, Short answer and Mathematical question will be added very soon. 
+Quiz-Core is a comprehensive terminal-based examination and quiz system featuring encrypted question databases, affine-cipher progress tracking, and secure role-based authentication for Students, Teachers, and Administrators.
 
-#Login system for every student, tecaher and admin will be added and they will have their separate sections
+---
 
-**How to use**
+## Features
 
-1. Enter filepath of original question (.txt formats only) and then enter the filepath of the ecnrypted version of the original file(.dat format is recommended).
+- **Multi-Engine Quizzing System**:
+  - **MCQ Engine**: 4-option multiple choice questions with affine encryption.
+  - **True/False Engine**: Binary choice statements scored with instant feedback.
+  - **Fill in the Blanks Engine**: Free-form text blanks evaluated with case-insensitive, whitespace-trimmed matching.
+- **Role-Based Authentication**:
+  - **Student Login**: Authenticate using encrypted class databases (e.g. `CSE-2025-B-B1.dat`) with student roll number and password. Automatically logs quiz attempts and tracks individual progress.
+  - **Teacher Login**: Authenticate with department database (e.g. `CSE_teachers.dat`), encrypt new quiz files from plaintext templates, monitor student performance, and export progress reports.
+  - **Administrator Dashboard**: Manage, encrypt, decrypt, and append student and teacher login databases.
+- **Timer & Scoring System**: Configurable per-question time limits with live countdown tracking, accuracy scoring, and auto-handling of unanswered questions upon timeout.
+- **Encrypted Storage**: All question banks, progress records, and credentials are encrypted using modular affine ciphers.
 
-2. Now you will type and Enter Name, Roll and Subject.
+---
 
-3. Questions will be loaded and you have to type the correct option(A/B/C/D).
+## Compilation
 
-4. Result will be shown after the quiz finishes and will be encrypted and stored in progress.dat.
+Build the application using `make`:
 
-**How to create Question text files**
+```bash
+make clean
+make
+```
 
-Follow this format:
+Run the application:
 
-    [Question]
-    [Option A]
-    [Option B]
-    [Option C]
-    [Option D]
-    [Answer option (A/B/C/D)]
+```bash
+./quiz-core
+```
 
+---
 
-Example :
+## Question File Formats
 
-    In a simple graph, what is the maximum number of edges between 5 vertices?
-    A) 5
-    B) 10
-    C) 15
-    D) 20
-    B
-    What is the next term in the arithmetic sequence 3, 7, 11, 15, ...?
-    A) 17
-    B) 18
-    C) 19
-    D) 20
-    C
+### 1. Multiple Choice Questions (MCQ)
+Each question consists of 6 lines:
+```
+[Question Statement]
+[Option A]
+[Option B]
+[Option C]
+[Option D]
+[Correct Option: A/B/C/D]
+```
 
-**#Any missing component in an individual question will cause undefined behaviour**
+*Example (`Questions/mcq_sample.txt`):*
+```
+What is the cardinality of the set {a, b, c}?
+A) 2
+B) 3
+C) 4
+D) 0
+B
+```
+
+### 2. True / False Questions (TF)
+Each question consists of 2 lines:
+```
+[Statement]
+[Answer: T or F]
+```
+
+*Example (`Questions/tf_sample.txt`):*
+```
+A binary search tree has an average search time complexity of O(log n).
+T
+A stack is a First-In-First-Out (FIFO) data structure.
+F
+```
+
+### 3. Fill in the Blanks Questions (FIB)
+Each question consists of 2 lines:
+```
+[Statement with blank (e.g. _______)]
+[Expected Answer]
+```
+
+*Example (`Questions/blank_sample.txt`):*
+```
+The data structure that operates on a Last-In-First-Out (LIFO) basis is called a _______.
+stack
+In computer science, CPU stands for Central _______ Unit.
+Processing
+```
+
+---
+
+## Default Login Credentials
+
+- **Students (`CSE-2025-B-B1.dat`)**:
+  - Roll: `81`, Password: `JzK7RcxHS0` (Zawad Ibrahim)
+  - Roll: `68`, Password: `PcbnaR8` (Maksudur Rahman)
+  - Roll: `77`, Password: `yiwWrxc7` (Imran Ahmed)
+- **Teachers (`CSE_teachers.dat`)**:
+  - Name: `Karim Mia`, Password: `Dib9dWuBx`
+  - Name: `Mohsin Ali`, Password: `Bib6dUtIp`
+  - Name: `Ayon Saha`, Password: `7HJmxIXvx`
+- **Administrator**:
+  - Password: `admin`

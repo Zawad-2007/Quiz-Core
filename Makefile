@@ -1,6 +1,5 @@
 CC = clang
-CFLAGS = -Wall -Wextra -std=c11
-CFLAGS = -Iinclude
+CFLAGS = -Wall -Wextra -std=c11 -Iinclude
 
 SOURCES = $(wildcard src/*.c)
 HEADERS = $(wildcard include/*.h)
@@ -11,7 +10,7 @@ TARGET = quiz-core
 all: $(TARGET)
 
 $(TARGET): $(SOURCES) $(HEADERS)
-	$(CC) $(CFLAGS) $(CFLAGS) $(SOURCES) -o $@
+	$(CC) $(CFLAGS) $(SOURCES) -o $@
 
 clean:
 	rm -f $(TARGET)

@@ -18,34 +18,39 @@ int encrypt_mcq_question(char original_filepath[], char encrypted_filepath[], Qu
  */
     int ques_count=0;
     FILE *unencrypted_ques = fopen(original_filepath, "rb");
-    FILE *encrypted_ques = fopen(encrypted_filepath, "wb");
-    Question q[100];
-
     if (unencrypted_ques == NULL)
     {
-        printf("\033[31mFILE error\033[0m\n");
+        printf("\033[31mFILE error: Cannot open original question file\033[0m\n");
         return -1;
     }
 
-    else
+    FILE *encrypted_ques = fopen(encrypted_filepath, "wb");
+    if (encrypted_ques == NULL)
     {
-        int i = 0;
-
-        while (qgets(q[i].ques, unencrypted_ques)!=NULL)
-        {
-            qgets(q[i].opt_a, unencrypted_ques);
-            qgets(q[i].opt_b, unencrypted_ques);
-            qgets(q[i].opt_c, unencrypted_ques);
-            qgets(q[i].opt_d, unencrypted_ques);
-            qgets(q[i].ans, unencrypted_ques);
-            i++;
-        }
-        ques_count = i;
+        printf("\033[31mFILE error: Cannot create encrypted question file\033[0m\n");
+        fclose(unencrypted_ques);
+        return -1;
     }
+
+    Question q[100];
+    int i = 0;
+
+    while (qgets(q[i].ques, unencrypted_ques)!=NULL)
+    {
+        qgets(q[i].opt_a, unencrypted_ques);
+        qgets(q[i].opt_b, unencrypted_ques);
+        qgets(q[i].opt_c, unencrypted_ques);
+        qgets(q[i].opt_d, unencrypted_ques);
+        qgets(q[i].ans, unencrypted_ques);
+        i++;
+    }
+    ques_count = i;
 
     if(ques_count>=100)
     {
-        printf("\033[31mMaximum Question limit(100) crossed\nAborting encryption...\033[0m");
+        printf("\033[31mMaximum Question limit(100) crossed\nAborting encryption...\033[0m\n");
+        fclose(unencrypted_ques);
+        fclose(encrypted_ques);
         return -1;
     }
 
@@ -79,7 +84,11 @@ int decryptAndload_mcq_question(char encrypted_filepath[], Question *q, Question
         return -1;
     }
 
-    fread(q_head_ptr, sizeof(QuestionHeader), 1, encrypted_ques);
+    if (fread(q_head_ptr, sizeof(QuestionHeader), 1, encrypted_ques) != 1)
+    {
+        fclose(encrypted_ques);
+        return -1;
+    }
     decrypt_affine((unsigned char *)q_head_ptr->quiz_code, 16, 5, 2);
     decrypt_affine((unsigned char *)q_head_ptr->seconds_per_ques, 4, 5, 2);
 
@@ -133,14 +142,17 @@ void run_mcq_quiz(Question *decrypted_q_ptr, QuizResult *qr_ptr, int ques_count,
     qr_ptr->total_marks = ques_count;
     qr_ptr->correct_ans = 0;
     qr_ptr->wrong_ans = 0;
+    qr_ptr->ignored = 0;
 
     for (int i = 0; i < ques_count; i++)
     {
-        printf("\n%s\n", decrypted_q_ptr[i].ques);
-        printf("%s%s%s%s\n", decrypted_q_ptr[i].opt_a, decrypted_q_ptr[i].opt_b, decrypted_q_ptr[i].opt_c, decrypted_q_ptr[i].opt_d);
+        printf("\nQ%d: %s", i + 1, decrypted_q_ptr[i].ques);
+        if (strchr(decrypted_q_ptr[i].ques, '\n') == NULL) printf("\n");
+        printf("%s%s%s%s", decrypted_q_ptr[i].opt_a, decrypted_q_ptr[i].opt_b, decrypted_q_ptr[i].opt_c, decrypted_q_ptr[i].opt_d);
+        if (strchr(decrypted_q_ptr[i].opt_d, '\n') == NULL) printf("\n");
 
         char ans_by_stud[8];
-        printf("Ans (A/B/C/D) [Enter 0 to ignore] :");
+        printf("Ans (A/B/C/D) [Enter 0 to ignore] : ");
 
         if (fgets(ans_by_stud, sizeof(ans_by_stud), stdin) == NULL)
         {
@@ -153,29 +165,39 @@ void run_mcq_quiz(Question *decrypted_q_ptr, QuizResult *qr_ptr, int ques_count,
         // time limit check
         if (difftime(cur_time, quiz_start_time) > quiz_time)
         {
-            printf("Given time for quiz has been passed\n");
+            printf("\n\033[31mGiven time for quiz has expired\033[0m\n");
             break;
         }
 
         // Validate answer safely
-        if (ans_by_stud[0] == decrypted_q_ptr[i].ans[0])
+        if (ans_by_stud[0] == '0' || ans_by_stud[0] == '\n')
         {
-            printf("Correct!\n");
-            qr_ptr->correct_ans++;
-        }
-        else if (ans_by_stud[0]=='0')
-        {
-            printf("Ignored\n");
+            printf("\033[33mIgnored\033[0m\n");
             qr_ptr->ignored++;
+        }
+        else if (toupper((unsigned char)ans_by_stud[0]) == toupper((unsigned char)decrypted_q_ptr[i].ans[0]))
+        {
+            printf("\033[32mCorrect!\033[0m\n");
+            qr_ptr->correct_ans++;
         }
         else
         {
-            printf("Incorrect answer!\n");
-            printf("Correct Answer :%s\n", decrypted_q_ptr[i].ans);
+            printf("\033[31mIncorrect answer!\033[0m\n");
+            printf("Correct Answer : %c\n", (char)toupper((unsigned char)decrypted_q_ptr[i].ans[0]));
             qr_ptr->wrong_ans++;
         }
     }
 
     qr_ptr->ignored += qr_ptr->total_marks - (qr_ptr->correct_ans + qr_ptr->wrong_ans + qr_ptr->ignored);  //Adds questions not answered because of time limit
-    qr_ptr->accuracy = (qr_ptr->correct_ans * 100.00) / qr_ptr->total_marks;
+    qr_ptr->accuracy = (qr_ptr->total_marks > 0) ? ((qr_ptr->correct_ans * 100.00f) / qr_ptr->total_marks) : 0.0f;
+
+    printf("\n==================================================\n");
+    printf("                  QUIZ RESULT                     \n");
+    printf("==================================================\n");
+    printf("Total Questions : %d\n", qr_ptr->total_marks);
+    printf("Correct Answers : %d\n", qr_ptr->correct_ans);
+    printf("Wrong Answers   : %d\n", qr_ptr->wrong_ans);
+    printf("Ignored         : %d\n", qr_ptr->ignored);
+    printf("Accuracy        : %.2f%%\n", qr_ptr->accuracy);
+    printf("==================================================\n\n");
 }

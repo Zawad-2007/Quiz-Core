@@ -11,7 +11,7 @@ void clear_screen();
 
 void print_divider(char ch, int length);
 
-void print_ascii_art(char filename[20]);
+void print_ascii_art(char filename[64]);
 
 void print_banner();
 

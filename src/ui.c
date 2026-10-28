@@ -23,15 +23,20 @@ void print_divider(char ch, int length)
     }
     putchar('\n');
 }
-void print_ascii_art(char filename[20])
+void print_ascii_art(char filename[64])
 {
     FILE *fp = fopen(filename, "r");
-    char c = fgetc(fp);
-    while (c != '*') //'*' is used at the beginning of the comment and end of the ascii art
+    if (fp == NULL)
+    {
+        return;
+    }
+    int c = fgetc(fp);
+    while (c != '*' && c != EOF)
     {
         putchar(c);
         c = fgetc(fp);
     }
+    fclose(fp);
 }
 
 void print_banner()

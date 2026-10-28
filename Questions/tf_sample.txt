@@ -1,0 +1,20 @@
+A binary search tree has an average search time complexity of O(log n).
+T
+In an undirected graph, an Euler path exists if and only if the number of vertices with odd degrees is either 0 or 2.
+T
+HTTP is a stateful communication protocol.
+F
+In C programming, array indices start at index 1.
+F
+The affine cipher is a type of monoalphabetic substitution cipher.
+T
+A stack is a First-In-First-Out (FIFO) data structure.
+F
+Quick sort has a worst-case time complexity of O(n^2).
+T
+Dijkstra's algorithm can correctly handle graphs with negative edge weights.
+F
+A linked list allows O(1) random access to any element by index.
+F
+Boolean algebra is used extensively in digital logic circuit design.
+T

@@ -1,26 +1,11 @@
-#include"../include/progress.h"
+#include "../include/progress.h"
 
 void storeAndencrypt_progress_in_file(QuizResult *progress)
 {
-    FILE *file_exists = fopen("progress.dat", "rb");
-
-    if (!(file_exists))
-    {
-        FILE *fp = fopen("progress.dat", "wb");
-        if (fp != NULL)
-        {
-            fclose(fp);
-        }
-    }
-    else
-    {
-        fclose(file_exists);
-    }
-
     FILE *progress_file = fopen("progress.dat", "ab");
     if (progress_file == NULL)
     {
-        printf("\033[31mFile Error\033[0m\n");
+        printf("\033[31mFile Error: Cannot open progress.dat\033[0m\n");
         return;
     }
 
@@ -32,16 +17,35 @@ void storeAndencrypt_progress_in_file(QuizResult *progress)
     snprintf(ignored, 8, "%d", progress->ignored);
     snprintf(acc, 8, "%.2f", progress->accuracy);
 
-    strcpy(qr_str.name, progress->name);
-    strcpy(qr_str.roll, progress->roll);
-    strcpy(qr_str.subject, progress->subject);
-    strcpy(qr_str.quiz_code, progress->quiz_code);
-    strcpy(qr_str.quiz_date, progress->quiz_date);
-    strcpy(qr_str.total_marks, t_marks);
-    strcpy(qr_str.correct_ans, c_ans);
-    strcpy(qr_str.wrong_ans, w_ans);
-    strcpy(qr_str.ignored, ignored);
-    strcpy(qr_str.accuracy, acc);
+    strncpy(qr_str.name, progress->name, sizeof(qr_str.name) - 1);
+    qr_str.name[sizeof(qr_str.name) - 1] = '\0';
+
+    strncpy(qr_str.roll, progress->roll, sizeof(qr_str.roll) - 1);
+    qr_str.roll[sizeof(qr_str.roll) - 1] = '\0';
+
+    strncpy(qr_str.subject, progress->subject, sizeof(qr_str.subject) - 1);
+    qr_str.subject[sizeof(qr_str.subject) - 1] = '\0';
+
+    strncpy(qr_str.quiz_code, progress->quiz_code, sizeof(qr_str.quiz_code) - 1);
+    qr_str.quiz_code[sizeof(qr_str.quiz_code) - 1] = '\0';
+
+    strncpy(qr_str.quiz_date, progress->quiz_date, sizeof(qr_str.quiz_date) - 1);
+    qr_str.quiz_date[sizeof(qr_str.quiz_date) - 1] = '\0';
+
+    strncpy(qr_str.total_marks, t_marks, sizeof(qr_str.total_marks) - 1);
+    qr_str.total_marks[sizeof(qr_str.total_marks) - 1] = '\0';
+
+    strncpy(qr_str.correct_ans, c_ans, sizeof(qr_str.correct_ans) - 1);
+    qr_str.correct_ans[sizeof(qr_str.correct_ans) - 1] = '\0';
+
+    strncpy(qr_str.wrong_ans, w_ans, sizeof(qr_str.wrong_ans) - 1);
+    qr_str.wrong_ans[sizeof(qr_str.wrong_ans) - 1] = '\0';
+
+    strncpy(qr_str.ignored, ignored, sizeof(qr_str.ignored) - 1);
+    qr_str.ignored[sizeof(qr_str.ignored) - 1] = '\0';
+
+    strncpy(qr_str.accuracy, acc, sizeof(qr_str.accuracy) - 1);
+    qr_str.accuracy[sizeof(qr_str.accuracy) - 1] = '\0';
 
     encrypt_affine((unsigned char *)qr_str.name, 32, 5, 2);
     encrypt_affine((unsigned char *)qr_str.roll, 16, 5, 2);
@@ -55,7 +59,6 @@ void storeAndencrypt_progress_in_file(QuizResult *progress)
     encrypt_affine((unsigned char *)qr_str.accuracy, 8, 5, 2);
 
     fwrite(&qr_str, sizeof(QuizResultStr), 1, progress_file);
-
     fclose(progress_file);
 }
 
@@ -64,14 +67,17 @@ void decryptAndload_progress_in_mem()
     FILE *encr_progress_file = fopen("progress.dat", "rb");
     if (encr_progress_file == NULL)
     {
-        printf("\033[31mFile Error\033[0m\n");
+        printf("\033[31mFile Error: No progress.dat file found\033[0m\n");
         return;
     }
 
     QuizResultStr progress;
-
     int record_count = 0;
-    int i = 0;
+
+    printf("\n%-24s %-12s %-16s %-14s %-12s %-6s %-6s %-6s %-8s %-8s\n",
+           "Name", "Roll", "Subject", "Quiz Code", "Quiz Date", "Total", "Pass", "Fail", "Ignore", "Accuracy");
+    printf("----------------------------------------------------------------------------------------------------------------\n");
+
     while (fread(&progress, sizeof(QuizResultStr), 1, encr_progress_file) != 0)
     {
         decrypt_affine((unsigned char *)progress.name, 32, 5, 2);
@@ -84,46 +90,37 @@ void decryptAndload_progress_in_mem()
         decrypt_affine((unsigned char *)progress.wrong_ans, 8, 5, 2);
         decrypt_affine((unsigned char *)progress.ignored, 8, 5, 2);
         decrypt_affine((unsigned char *)progress.accuracy, 8, 5, 2);
-        i++;
+
+        printf("%-24s %-12s %-16s %-14s %-12s %-6s %-6s %-6s %-8s %-8s%%\n",
+               progress.name,
+               progress.roll,
+               progress.subject,
+               progress.quiz_code,
+               progress.quiz_date,
+               progress.total_marks,
+               progress.correct_ans,
+               progress.wrong_ans,
+               progress.ignored,
+               progress.accuracy);
+        record_count++;
     }
 
     fclose(encr_progress_file);
 
-    record_count = i; // record count
     int record_left = 256 - record_count;
-
     if (record_count < 256)
     {
-        printf("Records will be reset after %d quiz\n", record_left);
+        printf("\nRecords remaining before archival reset: %d\n", record_left);
     }
-    else if (record_count == 256)
+    else
     {
-        printf("\033[31mRecord limit maxed out\033[0m\n");
-        printf("\033[32mThe progress record will be reset\nPrevious record will be saved in a file\033[0m\n");
+        printf("\033[31mRecord limit maxed out (256). Archiving old records...\033[0m\n");
         migrate_oldRecord_toNew();
-    }
-
-    printf("%-32s%-16s%-16s%-32s%-32s%-8s%-8s%-8s%-8s%s\n", "Name", "Roll", "Subject", "Quiz Code", "Quiz Date", "Total", "Correct", "Wrong", "Ignored", "Accuracy");
-    printf("%-32s%-16s%-16s%-32s%-32s%-8s%-8s%-8s%-8s%s%%\n",
-           progress.name,
-           progress.roll,
-           progress.subject,
-           progress.quiz_code,
-           progress.quiz_date,
-           progress.total_marks,
-           progress.correct_ans,
-           progress.wrong_ans,
-           progress.ignored,
-           progress.accuracy);
-    if (record_count >= 256)
-    { // resets the record in the end if the maximum limit crosses
         FILE *reset_record = fopen("progress.dat", "wb");
-        if (reset_record == NULL)
+        if (reset_record != NULL)
         {
-            printf("\033[31mFile Error\033[0m\n");
-            return;
+            fclose(reset_record);
         }
-        fclose(reset_record);
     }
 }
 
@@ -132,15 +129,23 @@ void migrate_oldRecord_toNew()
     char date[12];
     get_date_str(date, sizeof(date));
 
-    char new_file_filepath[18] = {0};
-    strcpy(new_file_filepath, date);
-    strcat(new_file_filepath, ".dat");
+    char new_file_filepath[32] = {0};
+    snprintf(new_file_filepath, sizeof(new_file_filepath), "progress_%s.dat", date);
 
     FILE *old_file = fopen("progress.dat", "rb");
+    if (old_file == NULL)
+    {
+        return;
+    }
+
     FILE *new_file = fopen(new_file_filepath, "wb");
+    if (new_file == NULL)
+    {
+        fclose(old_file);
+        return;
+    }
 
     QuizResultStr buffer;
-
     while (fread(&buffer, sizeof(QuizResultStr), 1, old_file) != 0)
     {
         fwrite(&buffer, sizeof(QuizResultStr), 1, new_file);
@@ -148,15 +153,24 @@ void migrate_oldRecord_toNew()
 
     fclose(old_file);
     fclose(new_file);
+    printf("Archived old records to %s\n", new_file_filepath);
 }
 
 void show_all_progress_from_file(char *encr_progress_filepath)
 {
     FILE *progress = fopen(encr_progress_filepath, "rb");
+    if (progress == NULL)
+    {
+        printf("\033[31mFile Error: Cannot open '%s'\033[0m\n", encr_progress_filepath);
+        return;
+    }
+
     QuizResultStr qr_str;
     int i = 0;
 
-    printf("%-32s%-16s%-16s%-32s%-32s%-8s%-8s%-8s%-8s%s\n", "Name", "Roll", "Subject", "Quiz Code", "Quiz Date", "Total", "Correct", "Wrong", "Ignored", "Accuracy");
+    printf("\n%-24s %-12s %-16s %-14s %-12s %-6s %-6s %-6s %-8s %-8s\n",
+           "Name", "Roll", "Subject", "Quiz Code", "Quiz Date", "Total", "Pass", "Fail", "Ignore", "Accuracy");
+    printf("----------------------------------------------------------------------------------------------------------------\n");
 
     while (fread(&qr_str, sizeof(QuizResultStr), 1, progress) != 0)
     {
@@ -171,7 +185,7 @@ void show_all_progress_from_file(char *encr_progress_filepath)
         decrypt_affine((unsigned char *)qr_str.ignored, sizeof(qr_str.ignored), 5, 2);
         decrypt_affine((unsigned char *)qr_str.accuracy, sizeof(qr_str.accuracy), 5, 2);
 
-        printf("%-32s%-16s%-16s%-32s%-32s%-8s%-8s%-8s%-8s%s%%\n",
+        printf("%-24s %-12s %-16s %-14s %-12s %-6s %-6s %-6s %-8s %-8s%%\n",
                qr_str.name,
                qr_str.roll,
                qr_str.subject,
@@ -184,23 +198,100 @@ void show_all_progress_from_file(char *encr_progress_filepath)
                qr_str.accuracy);
         i++;
     }
-    printf("Total records : %d\n", i);
+
+    fclose(progress);
+    printf("----------------------------------------------------------------------------------------------------------------\n");
+    printf("Total records: %d\n\n", i);
+}
+
+void show_student_progress_from_file(char *encr_progress_filepath, char *student_roll)
+{
+    FILE *progress = fopen(encr_progress_filepath, "rb");
+    if (progress == NULL)
+    {
+        printf("\033[33mNo progress record file found ('%s'). Take a quiz first!\033[0m\n", encr_progress_filepath);
+        return;
+    }
+
+    QuizResultStr qr_str;
+    int i = 0;
+
+    printf("\n%-24s %-12s %-16s %-14s %-12s %-6s %-6s %-6s %-8s %-8s\n",
+           "Name", "Roll", "Subject", "Quiz Code", "Quiz Date", "Total", "Pass", "Fail", "Ignore", "Accuracy");
+    printf("----------------------------------------------------------------------------------------------------------------\n");
+
+    while (fread(&qr_str, sizeof(QuizResultStr), 1, progress) != 0)
+    {
+        decrypt_affine((unsigned char *)qr_str.name, sizeof(qr_str.name), 5, 2);
+        decrypt_affine((unsigned char *)qr_str.roll, sizeof(qr_str.roll), 5, 2);
+        decrypt_affine((unsigned char *)qr_str.subject, sizeof(qr_str.subject), 5, 2);
+        decrypt_affine((unsigned char *)qr_str.quiz_code, sizeof(qr_str.quiz_code), 5, 2);
+        decrypt_affine((unsigned char *)qr_str.quiz_date, sizeof(qr_str.quiz_date), 5, 2);
+        decrypt_affine((unsigned char *)qr_str.total_marks, sizeof(qr_str.total_marks), 5, 2);
+        decrypt_affine((unsigned char *)qr_str.correct_ans, sizeof(qr_str.correct_ans), 5, 2);
+        decrypt_affine((unsigned char *)qr_str.wrong_ans, sizeof(qr_str.wrong_ans), 5, 2);
+        decrypt_affine((unsigned char *)qr_str.ignored, sizeof(qr_str.ignored), 5, 2);
+        decrypt_affine((unsigned char *)qr_str.accuracy, sizeof(qr_str.accuracy), 5, 2);
+
+        // Check if student roll matches (or if roll is empty, show all)
+        if (student_roll == NULL || strlen(student_roll) == 0 || strcmp(qr_str.roll, student_roll) == 0)
+        {
+            printf("%-24s %-12s %-16s %-14s %-12s %-6s %-6s %-6s %-8s %-8s%%\n",
+                   qr_str.name,
+                   qr_str.roll,
+                   qr_str.subject,
+                   qr_str.quiz_code,
+                   qr_str.quiz_date,
+                   qr_str.total_marks,
+                   qr_str.correct_ans,
+                   qr_str.wrong_ans,
+                   qr_str.ignored,
+                   qr_str.accuracy);
+            i++;
+        }
+    }
+
+    fclose(progress);
+    printf("----------------------------------------------------------------------------------------------------------------\n");
+    if (i == 0)
+    {
+        printf("\033[33mNo quiz attempts found for student roll '%s'.\033[0m\n\n", student_roll);
+    }
+    else
+    {
+        printf("Found %d quiz attempt(s) for roll '%s'.\n\n", i, student_roll);
+    }
 }
 
 int decrypt_and_save_progress(char *encr_progress_filepath)
 {
     FILE *encr_progress = fopen(encr_progress_filepath, "rb");
+    if (encr_progress == NULL)
+    {
+        printf("\033[31mFile Error: Cannot open '%s'\033[0m\n", encr_progress_filepath);
+        return 1;
+    }
 
-    char decr_progress_filepath[64]="progress";
+    char decr_progress_filepath[64] = "progress_";
     char date[16];
     get_date_str(date, sizeof(date));
     strcat(decr_progress_filepath, date);
     strcat(decr_progress_filepath, ".txt");
 
-    FILE *decr_progress = fopen(decr_progress_filepath, "wb");
+    FILE *decr_progress = fopen(decr_progress_filepath, "w");
+    if (decr_progress == NULL)
+    {
+        printf("\033[31mFile Error: Cannot create '%s'\033[0m\n", decr_progress_filepath);
+        fclose(encr_progress);
+        return 1;
+    }
+
     QuizResultStr qr_str_buf;
 
-    fprintf(decr_progress, "%-32s%-16s%-16s%-32s%-32s%-8s%-8s%-8s%-8s%s\n", "Name", "Roll", "Subject", "Quiz Code", "Quiz Date", "Total", "Correct", "Wrong", "Ignored", "Accuracy");
+    fprintf(decr_progress, "%-32s%-16s%-16s%-32s%-32s%-8s%-8s%-8s%-8s%s\n",
+            "Name", "Roll", "Subject", "Quiz Code", "Quiz Date", "Total", "Correct", "Wrong", "Ignored", "Accuracy");
+
+    int rec_count = 0;
     while (fread(&qr_str_buf, sizeof(QuizResultStr), 1, encr_progress) != 0)
     {
         decrypt_affine((unsigned char *)qr_str_buf.name, sizeof(qr_str_buf.name), 5, 2);
@@ -213,6 +304,7 @@ int decrypt_and_save_progress(char *encr_progress_filepath)
         decrypt_affine((unsigned char *)qr_str_buf.wrong_ans, sizeof(qr_str_buf.wrong_ans), 5, 2);
         decrypt_affine((unsigned char *)qr_str_buf.ignored, sizeof(qr_str_buf.ignored), 5, 2);
         decrypt_affine((unsigned char *)qr_str_buf.accuracy, sizeof(qr_str_buf.accuracy), 5, 2);
+
         fprintf(decr_progress, "%-32s%-16s%-16s%-32s%-32s%-8s%-8s%-8s%-8s%s%%\n",
                 qr_str_buf.name,
                 qr_str_buf.roll,
@@ -224,13 +316,12 @@ int decrypt_and_save_progress(char *encr_progress_filepath)
                 qr_str_buf.wrong_ans,
                 qr_str_buf.ignored,
                 qr_str_buf.accuracy);
+        rec_count++;
     }
-    if (encr_progress == NULL || decr_progress == NULL)
-    {
-        return 1;
-    }
-    else    
-    {
-        return 0;
-    }
+
+    fclose(encr_progress);
+    fclose(decr_progress);
+
+    printf("\033[32mSuccessfully exported %d record(s) to '%s'\033[0m\n", rec_count, decr_progress_filepath);
+    return 0;
 }
