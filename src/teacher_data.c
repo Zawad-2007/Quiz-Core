@@ -12,7 +12,7 @@ int encrypt_TeacherLoginData(char *og_login_data_filepath)
     fgets(unnecessary_line, 256, og_login_data);
     free(unnecessary_line);
 
-    printf("Enter the Department Code properly : ");
+    printf("Enter the Department Code : ");
     char dept_code[16];
     scanf("%s", dept_code);
     getchar();
@@ -49,22 +49,28 @@ int encrypt_TeacherLoginData(char *og_login_data_filepath)
     {
         char *ptr[] = {ld.name, ld.dept_code, ld.designation_code, ld.joining_date, ld.password};
 
-        int i = 0; //get the first token
-        char *token = strtok(line_buf, ",");
+        int i = 0; 
+        char *token = strtok(line_buf, ",");//get the first token
 
         
         while (token != NULL && i < 5)
-        {//loop condition : valid token && array index check
+        {//loop conditions : valid token && array index check
             strcpy(ptr[i], token);
 
-            i++;
             token = strtok(NULL, ","); //grabbing the next token at the end of iteration
+            i++;//increments i for getting the next element in ptr[] array
+            if (token != NULL && i >= 5)
+            {//When strtok returns a valid pointer but the index has passed 4
+                printf("More element in the teacher login data of index %d\n", rec_count + 1);
+                printf("Skipping the extra element(s)\n");
+                break;
+            }
         }
 
         
-        if (i != 5)
+        if (i < 4)
         {
-            printf("More or less element in the teacher login data of index %d\n", rec_count + 1);
+            printf("Less element in the teacher login data of index %d\n", rec_count + 1);
             return -5;
         }
 
