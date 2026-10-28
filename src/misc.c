@@ -40,6 +40,10 @@ void rm_extra_spaces(char *str)
     {
         str[i] = str[i + space_count];
     }
+    for (int i = n - space_count; i < n; i++)
+    {
+        str[i] = '\0';
+    }
 }
 
 void get_date_str(char *d_str, int size)
