@@ -115,7 +115,7 @@ int decryptAndloadInmem_StudentLoginData(char *encr_login_data_filepath, ClassDa
     }
     else
     {
-        fread(&cd_ptr, sizeof(ClassData), 1, encr_login_data);
+        fread(cd_ptr, sizeof(ClassData), 1, encr_login_data);
 
         decrypt_affine((unsigned char *)cd_ptr->Dept_code, 8, 5, 2);
         decrypt_affine((unsigned char *)cd_ptr->batch_code, 8, 5, 2);
@@ -123,7 +123,7 @@ int decryptAndloadInmem_StudentLoginData(char *encr_login_data_filepath, ClassDa
         decrypt_affine((unsigned char *)cd_ptr->Lab_group_code, 8, 5, 2);       
 
         int i = 0;
-        while (fread(&ld_ptr, sizeof(StudentLoginDta), 1, encr_login_data) != 0)
+        while (fread(ld_ptr + i, sizeof(StudentLoginDta), 1, encr_login_data) != 0)
         {
             decrypt_affine((unsigned char *)ld_ptr[i].name, 32, 5, 2);
             decrypt_affine((unsigned char *)ld_ptr[i].roll, 16, 5, 2);
@@ -134,7 +134,7 @@ int decryptAndloadInmem_StudentLoginData(char *encr_login_data_filepath, ClassDa
                 StudentLoginDta *temp = realloc(ld_ptr, (i + 1) * sizeof(StudentLoginDta));
                 if(temp==NULL)
                 {
-                    return -1;
+                    return -2;
                 }
                 else
                 {

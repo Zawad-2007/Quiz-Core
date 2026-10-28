@@ -103,7 +103,7 @@ int decryptAndloadInmem_TeacherLoginData(char *encr_login_data_filepath, Teacher
     else
     {
         int i = 0;
-        while (fread(&ld_ptr, sizeof(TeacherLoginDta), 1, encr_login_data) != 0)
+        while (fread(ld_ptr + i, sizeof(TeacherLoginDta), 1, encr_login_data) != 0)
         {
             decrypt_affine((unsigned char *)ld_ptr[i].name, 32, 5, 2);
             decrypt_affine((unsigned char *)ld_ptr[i].dept_code, 8, 5, 2);
